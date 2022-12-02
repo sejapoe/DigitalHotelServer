@@ -1,6 +1,6 @@
 package ru.sejapoe.digitalhotelserver.hotel.info;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import ru.sejapoe.digitalhotelserver.core.db.BaseRepository;
 
-public interface HotelInfoRepository extends MongoRepository<HotelInfo, Long> {
+public interface HotelInfoRepository extends BaseRepository<HotelInfo> {
 }

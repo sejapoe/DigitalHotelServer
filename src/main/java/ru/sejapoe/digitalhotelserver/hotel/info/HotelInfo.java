@@ -2,12 +2,13 @@ package ru.sejapoe.digitalhotelserver.hotel.info;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import ru.sejapoe.digitalhotelserver.core.db.BaseDocument;
 import ru.sejapoe.digitalhotelserver.hotel.info.room.RoomClass;
 
 import java.util.List;
 
 @Document
-public final class HotelInfo {
+public final class HotelInfo extends BaseDocument {
     @Field(name = "name")
     private String name;
 

@@ -15,20 +15,23 @@ import java.util.List;
 @RestController
 public class HotelController {
     private final HotelInfoService hotelInfoService;
+    private final HotelService hotelService;
 
     @Autowired
-    public HotelController(HotelInfoService hotelInfoService) {
+    public HotelController(HotelInfoService hotelInfoService, HotelService hotelService) {
         this.hotelInfoService = hotelInfoService;
+        this.hotelService = hotelService;
     }
 
     @PostMapping(value = "/hotel")
     public ResponseEntity<?> create(@RequestBody HotelInfo client) {
-        hotelInfoService.create(client);
+        HotelInfo info = hotelInfoService.create(client);
+        hotelService.create(new Hotel(info));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/hotels")
-    public List<HotelInfo> hotels() {
-        return hotelInfoService.readAll();
+    public List<Hotel> hotels() {
+        return hotelService.readAll();
     }
 }
