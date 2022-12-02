@@ -8,8 +8,6 @@ import java.util.List;
 
 @Document
 public final class HotelInfo {
-    @Field(name = "id")
-    private long id;
     @Field(name = "name")
     private String name;
 
@@ -31,13 +29,5 @@ public final class HotelInfo {
 
     public void setRooms(List<RoomClass> rooms) {
         this.rooms = rooms;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 }

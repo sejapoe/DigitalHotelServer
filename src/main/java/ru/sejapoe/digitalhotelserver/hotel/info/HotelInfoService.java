@@ -29,7 +29,6 @@ public class HotelInfoService {
             return false;
         }
 
-        hotelInfo.setId(id);
         hotelRepository.save(hotelInfo);
         return true;
     }
