@@ -1,23 +1,19 @@
 package ru.sejapoe.digitalhotelserver.hotel.info;
 
-import jakarta.persistence.*;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import ru.sejapoe.digitalhotelserver.hotel.info.room.RoomClass;
-import ru.sejapoe.digitalhotelserver.hotel.info.room.RoomClassConverter;
 
 import java.util.List;
 
-@Entity
-@Table(name = "hotels_info")
+@Document
 public final class HotelInfo {
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Field(name = "id")
     private long id;
-    @Column(name = "name")
+    @Field(name = "name")
     private String name;
 
-    @Column(name = "rooms")
-    @Convert(converter = RoomClassConverter.class)
+    @Field(name = "rooms")
     private List<RoomClass> rooms;
 
 

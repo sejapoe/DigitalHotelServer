@@ -21,7 +21,7 @@ public class HotelInfoService {
     }
 
     public HotelInfo read(long id) {
-        return hotelRepository.getReferenceById(id);
+        return hotelRepository.findById(id).orElse(null);
     }
 
     public boolean update(HotelInfo hotelInfo, long id) {
