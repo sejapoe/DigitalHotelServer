@@ -1,4 +1,4 @@
-package ru.sejapoe.digitalhotelserver.hotel;
+package ru.sejapoe.digitalhotelserver.hotel.info.room;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

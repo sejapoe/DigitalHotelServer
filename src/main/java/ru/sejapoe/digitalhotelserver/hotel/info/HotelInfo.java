@@ -1,12 +1,14 @@
-package ru.sejapoe.digitalhotelserver.hotel;
+package ru.sejapoe.digitalhotelserver.hotel.info;
 
 import jakarta.persistence.*;
+import ru.sejapoe.digitalhotelserver.hotel.info.room.RoomClass;
+import ru.sejapoe.digitalhotelserver.hotel.info.room.RoomClassConverter;
 
 import java.util.List;
 
 @Entity
-@Table(name = "hotels")
-public final class Hotel {
+@Table(name = "hotels_info")
+public final class HotelInfo {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

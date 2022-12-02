@@ -1,36 +1,36 @@
-package ru.sejapoe.digitalhotelserver.hotel;
+package ru.sejapoe.digitalhotelserver.hotel.info;
 
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class HotelService {
-    private final HotelRepository hotelRepository;
+public class HotelInfoService {
+    private final HotelInfoRepository hotelRepository;
 
-    public HotelService(HotelRepository hotelRepository) {
+    public HotelInfoService(HotelInfoRepository hotelRepository) {
         this.hotelRepository = hotelRepository;
     }
 
-    public void create(Hotel hotel) {
-        hotelRepository.save(hotel);
+    public void create(HotelInfo hotelInfo) {
+        hotelRepository.save(hotelInfo);
     }
 
-    public List<Hotel> readAll() {
+    public List<HotelInfo> readAll() {
         return hotelRepository.findAll();
     }
 
-    public Hotel read(long id) {
+    public HotelInfo read(long id) {
         return hotelRepository.getReferenceById(id);
     }
 
-    public boolean update(Hotel hotel, long id) {
+    public boolean update(HotelInfo hotelInfo, long id) {
         if (!hotelRepository.existsById(id)) {
             return false;
         }
 
-        hotel.setId(id);
-        hotelRepository.save(hotel);
+        hotelInfo.setId(id);
+        hotelRepository.save(hotelInfo);
         return true;
     }
 
