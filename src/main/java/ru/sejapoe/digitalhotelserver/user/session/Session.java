@@ -12,14 +12,26 @@ import java.time.LocalDateTime;
 @Document
 public class Session extends BaseDocument {
     @DBRef
-    User user;
-    BitArray256 sessionKey;
+    private User user;
+    private BitArray256 sessionKey;
     @CreatedDate
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     public Session(User user, BitArray256 sessionKey) {
         this.user = user;
         this.sessionKey = sessionKey;
         this.createdAt = LocalDateTime.now();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public BitArray256 getSessionKey() {
+        return sessionKey;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }

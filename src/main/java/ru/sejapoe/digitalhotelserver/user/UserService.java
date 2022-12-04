@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -33,9 +34,13 @@ public class UserService {
 
         if (userRepository.existsById(login)) throw new UserAlreadyExists();
 
-        BitArray256 saltC = BitArray256.fromHexString(clientRegister.getSecond());
+        BitArray256 saltC = BitArray256.fromBase64(clientRegister.getSecond());
         BitArray256 saltS = random256();
         BitArray256 salt = xorByteArrays(saltS, saltC);
+
+        System.out.println("SaltC : " + Arrays.toString(saltC.asByteArray()));
+        System.out.println("SaltS : " + Arrays.toString(saltS.asByteArray()));
+
 
         activeRegistrations.put(login, salt);
 
@@ -77,14 +82,15 @@ public class UserService {
                         sessionKey.asByteArray()
                 ));
 
-        activeLogins.put(M.asHexString(), Pair.of(user, sessionKey));
-        return Pair.of(user.getSalt().asHexString(), B);
+        activeLogins.put(M.asBase64(), Pair.of(user, sessionKey));
+        return Pair.of(user.getSalt().asBase64(), B);
     }
 
-    public void confirm(String data) throws WrongPasswordException {
+    public BigInteger confirm(String data) throws WrongPasswordException {
         Pair<User, BitArray256> pair = activeLogins.get(data);
         if (pair == null) throw new WrongPasswordException();
-        sessionRepository.save(new Session(pair.getFirst(), pair.getSecond()));
+        Session session = sessionRepository.save(new Session(pair.getFirst(), pair.getSecond()));
+        return session.getId();
     }
 
     public static class UserAlreadyExists extends Exception {

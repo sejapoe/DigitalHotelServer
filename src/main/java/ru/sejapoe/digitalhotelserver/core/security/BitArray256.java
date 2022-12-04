@@ -3,6 +3,7 @@ package ru.sejapoe.digitalhotelserver.core.security;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigInteger;
+import java.util.Base64;
 
 @Document
 public final class BitArray256 {
@@ -28,8 +29,8 @@ public final class BitArray256 {
         return new BitArray256(bytes);
     }
 
-    public static BitArray256 fromHexString(String source) {
-        return fromBigInteger(new BigInteger(source, 16));
+    public static BitArray256 fromBase64(String source) {
+        return fromByteArray(Base64.getDecoder().decode(source));
     }
 
     public byte[] asByteArray() {
@@ -44,7 +45,7 @@ public final class BitArray256 {
         return new BigInteger(result.toString(), 16);
     }
 
-    public String asHexString() {
-        return asBigInteger().toString(16);
+    public String asBase64() {
+        return Base64.getEncoder().encodeToString(arr);
     }
 }

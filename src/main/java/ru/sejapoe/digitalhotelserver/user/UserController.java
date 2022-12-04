@@ -24,7 +24,7 @@ public class UserController {
     @PostMapping(value = "/register/start")
     public ResponseEntity<?> registerStart(@RequestBody Pair<String, String> data) {
         try {
-            return new ResponseEntity<>(userService.startRegistration(data).asHexString(), HttpStatus.OK);
+            return new ResponseEntity<>(userService.startRegistration(data).asBase64(), HttpStatus.OK);
         } catch (UserService.UserAlreadyExists e) {
             return new ResponseEntity<>(HttpStatus.FOUND);
         }
@@ -50,8 +50,7 @@ public class UserController {
     @PostMapping(value = "/login/finish")
     public ResponseEntity<?> loginFinish(@RequestBody String data) {
         try {
-            userService.confirm(data);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(userService.confirm(data), HttpStatus.OK);
         } catch (UserService.WrongPasswordException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
