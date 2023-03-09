@@ -3,3 +3,14 @@ spring:
     mongodb:
       host: mongodb
       port: 27017
+
+server:
+  ssl:
+    enabled: true
+    key-store-type: JKS
+    key-store: /key.p12
+    key-alias: 1
+    key-password: grace123
+    key-store-password: grace123
+    certificate: classpath:keystore/cert
+  port: 8443
