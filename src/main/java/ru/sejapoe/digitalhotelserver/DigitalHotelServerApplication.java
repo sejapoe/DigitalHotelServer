@@ -17,4 +17,6 @@ public class DigitalHotelServerApplication implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new SessionInterceptor());
     }
+
+
 }

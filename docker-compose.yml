@@ -1,0 +1,12 @@
+services:
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+
+  digital-hotel-server:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
