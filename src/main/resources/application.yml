@@ -13,4 +13,4 @@ server:
     key-password: grace123
     key-store-password: grace123
     certificate: classpath:keystore/cert
-  port: 8443
+  port: 443
