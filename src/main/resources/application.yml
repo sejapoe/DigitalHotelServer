@@ -8,9 +8,8 @@ server:
   ssl:
     enabled: true
     key-store-type: JKS
-    key-store: /key.p12
-    key-alias: 1
+    key-store: classpath:keystore/keystore.jks
+    key-alias: server
     key-password: grace123
     key-store-password: grace123
-    certificate: classpath:keystore/cert
   port: 443
