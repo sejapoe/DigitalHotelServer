@@ -40,32 +40,32 @@ jobs:
       - name: Publish dockerimage to docker hub
         run: docker push ${{secrets.docker_username}}/${{secrets.repo_name}}:latest
 
-#  deploy:
-#    needs: build
-#    runs-on: ubuntu-latest
-#    if: contains(github.ref, 'deployment')
-#    steps:
-#      - uses: actions/checkout@master
-#      - name: copy file via ssh password
-#        uses: appleboy/scp-action@master
-#        with:
-#          host: ${{ secrets.server_hostname }}
-#          username: ${{ secrets.server_user }}
-#          key: ${{ secrets.openssh_private_key }}
-#          source: "docker-compose.yml"
-#          target: "/home/dockerfiles"
-#      - name: Get the version
-#        id: vars
-#        run: echo ::set-output name=tag::$(echo ${GITHUB_SHA:10})
-#      - name: Execute SSH commmands on remote server
-#        uses: JimCronqvist/action-ssh@master
-#        env:
-#          APPLICATION_IMAGE_TAG: ${{steps.vars.outputs.tag}}
-#        with:
-#          hosts: '${{ secrets.server_user }}@${{ secrets.server_hostname }}'
-#          privateKey: ${{ secrets.openssh_private_key }}
-#          debug: false
-#          command: |
-#            ls -lah
-#            echo "ssh successful"
-#            cd /home/dockerfiles/ && ./deploy.sh $APPLICATION_IMAGE_TAG $MYSQL_VERSION $MYSQL_ROOT_PASSWORD $MYSQL_USER $MYSQL_PASS
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: contains(github.ref, 'deployment')
+    steps:
+      #      - uses: actions/checkout@master
+      #      - name: copy file via ssh password
+      #        uses: appleboy/scp-action@master
+      #        with:
+      #          host: ${{ secrets.SSH_HOST }}
+      #          username: ${{ secrets.SSH_USER }}
+      #          key: ${{ secrets.SSH_KEY }}
+      #          source: "docker-compose.yml"
+      #          target: "/home/dockerfiles"
+      #      - name: Get the version
+      #        id: vars
+      #        run: echo ::set-output name=tag::$(echo ${GITHUB_SHA:10})
+      - name: Execute SSH commmands on remote server
+        uses: JimCronqvist/action-ssh@master
+        #        env:
+        #          APPLICATION_IMAGE_TAG: ${{steps.vars.outputs.tag}}
+        with:
+          hosts: '${{ secrets.ssh_user }}@${{ secrets.ssh_host }}'
+          privateKey: ${{ secrets.ssh_key }}
+          debug: false
+          command: |
+            ls -lah
+            echo "ssh successful"
+            ./server/deploy.sh
