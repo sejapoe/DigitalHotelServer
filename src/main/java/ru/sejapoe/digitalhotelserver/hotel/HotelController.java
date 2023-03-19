@@ -34,7 +34,7 @@ public class HotelController implements SessionServiceHolder {
     @PostMapping(value = "/hello")
     public ResponseEntity<?> hello(@RequestBody User user, @RequestBody Collection<Number> data) {
         System.out.println(user.getUsername() + " " + data);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("Hello", HttpStatus.OK);
     }
 
     @PostMapping(value = "/hotel")
