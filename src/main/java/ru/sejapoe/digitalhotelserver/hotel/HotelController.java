@@ -11,10 +11,8 @@ import ru.sejapoe.digitalhotelserver.core.security.AuthorizationRequired;
 import ru.sejapoe.digitalhotelserver.core.security.SessionServiceHolder;
 import ru.sejapoe.digitalhotelserver.hotel.info.HotelInfo;
 import ru.sejapoe.digitalhotelserver.hotel.info.HotelInfoService;
-import ru.sejapoe.digitalhotelserver.user.User;
 import ru.sejapoe.digitalhotelserver.user.session.SessionService;
 
-import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -31,10 +29,9 @@ public class HotelController implements SessionServiceHolder {
     }
 
     @AuthorizationRequired
-    @PostMapping(value = "/hello")
-    public ResponseEntity<?> hello(@RequestBody User user, @RequestBody Collection<Number> data) {
-        System.out.println(user.getUsername() + " " + data);
-        return new ResponseEntity<>("Hello", HttpStatus.OK);
+    @GetMapping(value = "/hello")
+    public ResponseEntity<?> hello() {
+        return new ResponseEntity<>("hello", HttpStatus.OK);
     }
 
     @PostMapping(value = "/hotel")
