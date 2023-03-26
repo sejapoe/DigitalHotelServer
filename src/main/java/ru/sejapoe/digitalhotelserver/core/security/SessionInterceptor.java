@@ -17,6 +17,10 @@ public class SessionInterceptor implements HandlerInterceptor {
                 && handlerMethod.getBean() instanceof SessionServiceHolder bean
                 && handlerMethod.hasMethodAnnotation(AuthorizationRequired.class)) {
             String authorization = request.getHeader("Authorization");
+            if (authorization == null) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                return false;
+            }
             String token = authorization.split(" ")[1];
             JwtParser jwtParser = Jwts.parserBuilder().setSigningKeyResolver(
                     new SigningKeyResolver() {
