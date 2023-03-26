@@ -4,12 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sejapoe.digitalhotelserver.core.security.AuthorizationRequired;
 import ru.sejapoe.digitalhotelserver.core.security.SessionServiceHolder;
-import ru.sejapoe.digitalhotelserver.hotel.info.HotelInfo;
 import ru.sejapoe.digitalhotelserver.hotel.info.HotelInfoService;
 import ru.sejapoe.digitalhotelserver.user.session.SessionService;
 
@@ -32,13 +29,6 @@ public class HotelController implements SessionServiceHolder {
     @GetMapping(value = "/hello")
     public ResponseEntity<?> hello() {
         return new ResponseEntity<>("hello", HttpStatus.OK);
-    }
-
-    @PostMapping(value = "/hotel")
-    public ResponseEntity<?> create(@RequestBody HotelInfo client) {
-        HotelInfo info = hotelInfoService.create(client);
-        hotelService.create(new Hotel(info));
-        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/hotels")

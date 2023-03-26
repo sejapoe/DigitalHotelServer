@@ -1,6 +1,7 @@
 package ru.sejapoe.digitalhotelserver.core.security;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
@@ -35,26 +36,12 @@ public class SessionInterceptor implements HandlerInterceptor {
                         }
                     }
             ).build();
-            if (!jwtParser.isSigned(token)) {
+            try {
+                jwtParser.parse(token);
+            } catch (IllegalArgumentException | SignatureException | ExpiredJwtException e) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return false;
             }
-//            if (request.getMethod().equalsIgnoreCase("post")) {
-//                try {
-//                    Pair<Session, String> decrypt = bean.getSessionService().decrypt(request.getReader().lines().collect(Collectors.joining(System.lineSeparator())));
-//                    Object o = new ObjectMapper().readValue(decrypt.getSecond(), handlerMethod.getMethodParameters()[1].getParameterType());
-//                    handlerMethod.getMethod().invoke(bean, decrypt.getFirst().getUser(), o);
-//                } catch (SessionService.Unauthorized e) {
-//                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
-//                } catch (DatabindException e) {
-//                    LoggerFactory.getLogger(SessionInterceptor.class).warn(e.getMessage());
-//                    response.setStatus(HttpStatus.BAD_REQUEST.value());
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-//                }
-//                return false;
-//            }
         }
         return true;
     }
