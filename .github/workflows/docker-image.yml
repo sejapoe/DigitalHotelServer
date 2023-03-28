@@ -65,15 +65,4 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           format: markdown
-          message: |
-            🚀 New push detected on branch `*${{ github.ref }}*`!
-            
-            📝 *Commit message*: `${{ github.event.head_commit.message }}`
-            
-            👤 *Committer*: ${{ github.event.head_commit.committer.name }} (${github.event.head_commit.committer.email})
-            
-            🆔 *Commit SHA*: `||${{ github.event.head_commit.id }}||`
-            
-            🛠️ *Total commits in push*: ${{ github.event.commits.length }}
-            
-            ✅ Deployment to production server was successful!
+          message: test
