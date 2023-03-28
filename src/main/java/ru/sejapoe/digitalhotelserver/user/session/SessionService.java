@@ -23,4 +23,12 @@ public class SessionService {
         return Keys.hmacShaKeyFor(session.getSessionKey().asByteArray());
     }
 
+    public void endSession(Session session) {
+        sessionRepository.delete(session);
+    }
+
+    public Session getSession(String rawSessionId) {
+        BigInteger sessionId = new BigInteger(rawSessionId, 16);
+        return sessionRepository.findById(sessionId).orElse(null);
+    }
 }

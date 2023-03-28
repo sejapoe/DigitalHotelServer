@@ -7,18 +7,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import ru.sejapoe.digitalhotelserver.core.security.AuthorizationRequired;
+import ru.sejapoe.digitalhotelserver.core.security.SessionServiceHolder;
+import ru.sejapoe.digitalhotelserver.core.security.UserSession;
+import ru.sejapoe.digitalhotelserver.user.session.Session;
+import ru.sejapoe.digitalhotelserver.user.session.SessionService;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 
 @RestController
-public class UserController {
+public class UserController implements SessionServiceHolder {
     private final UserService userService;
+    private final SessionService sessionService;
+
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, SessionService sessionService) {
         this.userService = userService;
+        this.sessionService = sessionService;
     }
 
     @PostMapping(value = "/register/start")
@@ -54,5 +62,18 @@ public class UserController {
         } catch (UserService.WrongPasswordException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
+    }
+
+
+    @AuthorizationRequired
+    @PostMapping(value = "/logout")
+    public ResponseEntity<?> logout(@UserSession Session session) {
+        sessionService.endSession(session);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
+    public SessionService getSessionService() {
+        return sessionService;
     }
 }

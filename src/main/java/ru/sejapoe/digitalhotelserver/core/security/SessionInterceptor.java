@@ -6,11 +6,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import ru.sejapoe.digitalhotelserver.user.session.Session;
 
 import java.security.Key;
 
+@Component
 public class SessionInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) {
@@ -37,7 +40,9 @@ public class SessionInterceptor implements HandlerInterceptor {
                     }
             ).build();
             try {
-                jwtParser.parse(token);
+                Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
+                Session session = bean.getSessionService().getSession(claimsJws.getBody().getSubject());
+                request.setAttribute("session", session);
             } catch (IllegalArgumentException | SignatureException | ExpiredJwtException e) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return false;
