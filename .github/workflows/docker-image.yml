@@ -70,8 +70,8 @@ jobs:
             
             📝 *Commit message*: `${{ github.event.head_commit.message }}`
             
-            👤 *Committer*: `${{ github.event.head_commit.committer.name }}`
+            👤 *Committer*: `${{ github.event.head_commit.committer.name }}`  
             
-            🆔 *Commit SHA*: ||${{ github.event.head_commit.id }}||
+            🔍 *See changes*: [View changes](${{ github.event.head_commit.url }})       
             
             ✅ *Deployment to production server was successful!*
