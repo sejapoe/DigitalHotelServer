@@ -73,6 +73,6 @@ jobs:
             
             🆔 *Commit SHA*: `||${{ github.event.head_commit.id }}||`
             
-            🛠️ *Total commits in push*: ${{ github.event.commits | length }}
+            🛠️ *Total commits in push*: ${{ github.event.commits.length }}
             
             ✅ Deployment to production server was successful!
