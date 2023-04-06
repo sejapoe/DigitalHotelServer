@@ -1,0 +1,77 @@
+# This workflow will build a Java project with Gradle and deploy it on server
+# deploy.sh will take the given parameters and perform the necessary operations, deploy.sh runs `docker-compose pull` and `docker-compose up -d` 
+
+
+
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew clean buildFatJar
+      - name: Get the version
+        id: vars
+        run: echo ::set-output name=tag::$(echo ${GITHUB_SHA:10})
+      - name: Docker login
+        env:
+          DOCKER_USERNAME: ${{ secrets.dockerhub_username }}
+          DOCKER_PASSWORD: ${{ secrets.dockerhub_password }}
+        run: docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" docker.io
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag ${{secrets.docker_username}}/${{secrets.repo_name}}:${{steps.vars.outputs.tag}}
+      - name: Publish dockerimage to docker hub
+        run: docker push ${{secrets.docker_username}}/${{secrets.repo_name}}:${{steps.vars.outputs.tag}}
+      - name: Build Docker image with latest tag
+        run: docker build . --file Dockerfile --tag ${{secrets.docker_username}}/${{secrets.repo_name}}:latest
+      - name: Publish dockerimage to docker hub
+        run: docker push ${{secrets.docker_username}}/${{secrets.repo_name}}:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute SSH commmands on remote server
+        uses: JimCronqvist/action-ssh@master
+        with:
+          hosts: '${{ secrets.ssh_user }}@${{ secrets.ssh_host }}'
+          privateKey: ${{ secrets.ssh_key }}
+          debug: false
+          command: |
+            echo "ssh successful"
+            cd server
+            ./deploy.sh
+
+  notify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Telegram Notify
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            🚀 *New push detected on branch* `${{ github.ref }}`!
+            
+            📝 *Commit message*: `${{ github.event.head_commit.message }}`
+            
+            👤 *Committer*: `${{ github.event.head_commit.committer.name }}`  
+            
+            🔍 *See changes*: [View changes](${{ github.event.head_commit.url }})       
+            
+            ✅ *Deployment to production server was successful!*
