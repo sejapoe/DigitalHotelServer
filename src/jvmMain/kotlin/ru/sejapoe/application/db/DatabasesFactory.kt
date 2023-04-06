@@ -11,7 +11,7 @@ import ru.sejapoe.application.user.Users
 object DatabasesFactory {
     fun init() {
         Database.connect(
-            "jdbc:postgresql://localhost:5432/test", driver = "org.postgresql.Driver",
+            "jdbc:postgresql://db:5432/test?user=postgres", driver = "org.postgresql.Driver",
             user = "sejapoe"
         )
 
