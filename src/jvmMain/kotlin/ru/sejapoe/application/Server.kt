@@ -51,7 +51,7 @@ fun main() {
         module(Application::module)
     }
 
-    DatabasesFactory.init()
+    DatabasesFactory.init(isProduction)
     embeddedServer(Netty, environment).start(wait = true)
 }
 

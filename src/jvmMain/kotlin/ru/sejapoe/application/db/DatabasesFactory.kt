@@ -8,10 +8,14 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import ru.sejapoe.application.user.Sessions
 import ru.sejapoe.application.user.Users
 
+private const val productionUrl = "jdbc:postgresql://db:5432/test?user=postgres"
+private const val developmentUrl = "jdbc:postgresql://localhost:5432/test"
+
 object DatabasesFactory {
-    fun init() {
+    fun init(isProduction: Boolean) {
         Database.connect(
-            "jdbc:postgresql://db:5432/test?user=postgres", driver = "org.postgresql.Driver",
+            if (isProduction) productionUrl else developmentUrl,
+            driver = "org.postgresql.Driver",
             user = "sejapoe"
         )
 
