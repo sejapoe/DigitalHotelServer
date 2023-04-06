@@ -4,6 +4,8 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.PairSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -19,7 +21,7 @@ fun Application.configureSerialization() {
         json(json = Json {
             serializersModule = SerializersModule {
                 contextual(BigIntegerSerializer)
-//                contextual(PairSerializer(String.serializer(), BigIntegerSerializer))
+                contextual(PairSerializer(String.serializer(), BigIntegerSerializer))
             }
         })
     }
