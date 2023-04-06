@@ -4,9 +4,6 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.builtins.PairSerializer
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -29,7 +26,7 @@ fun Application.configureSerialization() {
 }
 
 //@Serializer(forClass = BigInteger::class)
-object BigIntegerSerializer: KSerializer<BigInteger> {
+object BigIntegerSerializer : KSerializer<BigInteger> {
     override fun deserialize(decoder: Decoder) = decoder.decodeString().toBigInteger()
 
     override fun serialize(encoder: Encoder, value: BigInteger) = encoder.encodeString(value.toString())

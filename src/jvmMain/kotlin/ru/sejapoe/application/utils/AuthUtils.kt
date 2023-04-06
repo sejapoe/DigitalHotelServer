@@ -8,7 +8,7 @@ import kotlin.experimental.xor
 
 val g = BigInteger.valueOf(2)
 val N = BigInteger("EEAF0AB9ADB38DD69C33F80AA8FC5E86072618775FF3C0B9EA2314C9C256576D674DF7", 16)
-val k: BigInteger = hash(g.toByteArray(), N.toByteArray()).asBigInteger();
+val k: BigInteger = hash(g.toByteArray(), N.toByteArray()).asBigInteger()
 
 fun modPow(bitArray256: BitArray256): BigInteger {
     return g.modPow(bitArray256.asBigInteger(), N)
