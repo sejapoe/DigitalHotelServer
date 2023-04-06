@@ -31,9 +31,6 @@ fun main() {
 
 
     val environment = applicationEngineEnvironment {
-        connector {
-            port = if (isProduction) 443 else 8080
-        }
         if (isProduction) {
             val keyStoreFile = File("/keys/keystore.jks")
             val keyStore = KeyStore.getInstance(keyStoreFile, keyStorePassword.toCharArray())
@@ -45,6 +42,10 @@ fun main() {
             ) {
                 port = 443
                 keyStorePath = keyStoreFile
+            }
+        } else {
+            connector {
+                port = 8080
             }
         }
         module(Application::module)
