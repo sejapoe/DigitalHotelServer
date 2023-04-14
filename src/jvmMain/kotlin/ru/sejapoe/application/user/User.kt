@@ -6,12 +6,6 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import ru.sejapoe.application.utils.BitArray256
 
-//data class User(
-//    val username: String,
-//    val salt: BitArray256,
-//    val verifier: BigInteger
-//)
-
 class User(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<User>(Users)
 

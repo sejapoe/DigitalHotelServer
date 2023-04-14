@@ -5,6 +5,10 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
+import ru.sejapoe.application.hotel.model.Hotels
+import ru.sejapoe.application.hotel.model.Reservations
+import ru.sejapoe.application.hotel.model.RoomTypes
+import ru.sejapoe.application.hotel.model.Rooms
 import ru.sejapoe.application.user.Sessions
 import ru.sejapoe.application.user.Users
 
@@ -24,6 +28,10 @@ object DatabasesFactory {
 
             SchemaUtils.create(Users)
             SchemaUtils.create(Sessions)
+            SchemaUtils.create(Hotels)
+            SchemaUtils.create(Reservations)
+            SchemaUtils.create(Rooms)
+            SchemaUtils.create(RoomTypes)
         }
     }
 }
