@@ -41,6 +41,8 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
+                implementation("com.google.firebase:firebase-admin:7.1.1")
+                implementation("ch.qos.logback:logback-classic:1.0.0")
                 implementation("io.jsonwebtoken:jjwt-api:0.11.2")
                 implementation("io.jsonwebtoken:jjwt-impl:0.11.2")
                 implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
@@ -48,6 +50,7 @@ kotlin {
                 implementation("org.jetbrains.exposed:exposed-core:0.41.1")
                 implementation("org.jetbrains.exposed:exposed-dao:0.41.1")
                 implementation("org.jetbrains.exposed:exposed-jdbc:0.41.1")
+                implementation("org.jetbrains.exposed:exposed-java-time:0.41.1")
                 implementation("io.ktor:ktor-server-content-negotiation:2.0.2")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.2")
                 implementation("io.ktor:ktor-network-tls-certificates:2.0.2")
@@ -70,6 +73,7 @@ kotlin {
 
 application {
     mainClass.set("ru.sejapoe.application.ServerKt")
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=true")
 }
 
 ktor {
@@ -84,4 +88,7 @@ tasks.named<Copy>("jvmProcessResources") {
 tasks.named<JavaExec>("run") {
     dependsOn(tasks.named<Jar>("jvmJar"))
     classpath(tasks.named<Jar>("jvmJar"))
+}
+dependencies {
+    implementation("io.ktor:ktor-server-call-logging-jvm:2.2.4")
 }

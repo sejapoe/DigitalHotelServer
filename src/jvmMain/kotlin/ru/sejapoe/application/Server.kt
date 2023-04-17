@@ -3,8 +3,12 @@ package ru.sejapoe.application
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.callloging.*
+import io.ktor.server.request.*
 import kotlinx.html.*
+import org.slf4j.event.Level
 import ru.sejapoe.application.db.DatabasesFactory
+import ru.sejapoe.application.plugins.configureNotifications
 import ru.sejapoe.application.plugins.configureRouting
 import ru.sejapoe.application.plugins.configureSerialization
 import java.io.File
@@ -44,6 +48,7 @@ fun main() {
                 keyStorePath = keyStoreFile
             }
         } else {
+            developmentMode = true
             connector {
                 port = 8080
             }
@@ -51,11 +56,16 @@ fun main() {
         module(Application::module)
     }
 
-    DatabasesFactory.init()
+    DatabasesFactory.init(isProduction)
     embeddedServer(Netty, environment).start(wait = true)
 }
 
 fun Application.module() {
+    install(CallLogging) {
+        level = Level.INFO
+        filter { call -> call.request.path().startsWith("/") }
+    }
     configureRouting()
     configureSerialization()
+    configureNotifications()
 }
