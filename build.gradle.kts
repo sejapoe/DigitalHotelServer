@@ -41,6 +41,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
+                implementation("com.google.firebase:firebase-admin:7.1.1")
                 implementation("ch.qos.logback:logback-classic:1.0.0")
                 implementation("io.jsonwebtoken:jjwt-api:0.11.2")
                 implementation("io.jsonwebtoken:jjwt-impl:0.11.2")

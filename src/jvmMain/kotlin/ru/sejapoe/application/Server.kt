@@ -8,6 +8,7 @@ import io.ktor.server.request.*
 import kotlinx.html.*
 import org.slf4j.event.Level
 import ru.sejapoe.application.db.DatabasesFactory
+import ru.sejapoe.application.plugins.configureNotifications
 import ru.sejapoe.application.plugins.configureRouting
 import ru.sejapoe.application.plugins.configureSerialization
 import java.io.File
@@ -66,4 +67,5 @@ fun Application.module() {
     }
     configureRouting()
     configureSerialization()
+    configureNotifications()
 }

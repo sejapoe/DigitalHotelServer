@@ -16,10 +16,12 @@ class Session(id: EntityID<Int>) : IntEntity(id) {
     var sessionKey by Sessions.sessionKey.transform({ it.bytes }, { BitArray256(it) })
     var createdAt: LocalDateTime by Sessions.createdAt.default(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
         .transform({ it.toEpochSecond(ZoneOffset.UTC) }, { LocalDateTime.ofEpochSecond(it, 0, ZoneOffset.UTC) })
+    var notificationToken by Sessions.notificationToken
 }
 
 object Sessions : IntIdTable() {
     val user = reference("user", Users)
     val sessionKey = binary("session_key", 32)
     val createdAt = long("created_at")
+    val notificationToken = varchar("notification_token", 300).nullable()
 }

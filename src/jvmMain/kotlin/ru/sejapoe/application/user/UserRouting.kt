@@ -53,6 +53,14 @@ fun Routing.userRouting() {
         }
     }
 
+    postAuth("/subscribe") {
+        val data = call.receive<String>()
+        transaction {
+            this@postAuth.session.notificationToken = data
+        }
+        call.respond(HttpStatusCode.OK)
+    }
+
     postAuth("/logout") {
         transaction {
             session.delete()
