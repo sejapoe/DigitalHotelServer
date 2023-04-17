@@ -11,12 +11,33 @@ class Hotel(id: EntityID<Int>) : IntEntity(id) {
 
     var name by Hotels.name
     val roomTypes by RoomType referrersOn RoomTypes.hotel
+    val rooms by Room referrersOn Rooms.hotel
+    val reservations by Reservation referrersOn Reservations.hotel
 
-    fun asDomain() = HotelDomain(id.value, name, roomTypes.map { it.asDomain() })
+    fun asDTO() = HotelDTO(
+        id.value,
+        name,
+        roomTypes.map { it.asDTO() },
+        rooms.map { it.asDTO() },
+        reservations.map { it.asDTO() })
+
+    fun asLessDTO() = HotelLessDTO(id.value, name)
 }
 
 @Serializable
-data class HotelDomain(val id: Int?, val name: String, val roomTypes: List<RoomTypeDomain>)
+data class HotelDTO(
+    val id: Int?,
+    val name: String,
+    val roomTypes: List<RoomTypeDTO>,
+    val rooms: List<RoomDTO>,
+    val reservations: List<ReservationDTO>
+)
+
+@Serializable
+data class HotelLessDTO(
+    val id: Int,
+    val name: String,
+)
 
 
 object Hotels : IntIdTable() {

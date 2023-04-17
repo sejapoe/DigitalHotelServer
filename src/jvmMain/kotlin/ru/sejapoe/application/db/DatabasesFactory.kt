@@ -5,10 +5,7 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
-import ru.sejapoe.application.hotel.model.Hotels
-import ru.sejapoe.application.hotel.model.Reservations
-import ru.sejapoe.application.hotel.model.RoomTypes
-import ru.sejapoe.application.hotel.model.Rooms
+import ru.sejapoe.application.hotel.model.*
 import ru.sejapoe.application.user.Sessions
 import ru.sejapoe.application.user.Users
 
@@ -17,7 +14,7 @@ private const val developmentUrl = "jdbc:postgresql://localhost:5432/test"
 
 object DatabasesFactory {
     fun init(isProduction: Boolean) {
-        Database.connect(
+        val database = Database.connect(
             if (isProduction) productionUrl else developmentUrl,
             driver = "org.postgresql.Driver",
             user = "sejapoe"
@@ -32,6 +29,7 @@ object DatabasesFactory {
             SchemaUtils.create(Reservations)
             SchemaUtils.create(Rooms)
             SchemaUtils.create(RoomTypes)
+            SchemaUtils.create(Occupations)
         }
     }
 }

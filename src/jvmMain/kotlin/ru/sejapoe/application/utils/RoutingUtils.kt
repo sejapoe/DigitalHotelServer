@@ -28,6 +28,7 @@ fun Route.postAuth(path: String, function: suspend AuthorizedPipeline.() -> Unit
     post(path) {
         val authorization =
             call.request.header("Authorization") ?: return@post call.respond(HttpStatusCode.Unauthorized)
+        println(authorization)
         val token = authorization.split(" ")[1]
         val parser = Jwts.parserBuilder().setSigningKeyResolver(
             object : SigningKeyResolver {
