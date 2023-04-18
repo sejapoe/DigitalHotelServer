@@ -7,6 +7,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.sejapoe.application.hotel.model.*
+import ru.sejapoe.application.utils.getAuth
 import ru.sejapoe.application.utils.postAuth
 import ru.sejapoe.application.utils.toDate
 import java.time.LocalDate
@@ -85,6 +86,11 @@ fun Routing.hotelRouting() {
     }
 
     route("/reservations") {
+        getAuth {
+            val reservations = transaction { session.user.reservations.map(Reservation::asDTO) }
+            call.respond(HttpStatusCode.OK, reservations)
+        }
+
         get("/{hotelId}/{checkIn}/{checkOut}") {
             val hotelId =
                 this.call.parameters["hotelId"]?.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)

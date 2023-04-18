@@ -20,11 +20,13 @@ class Reservation(id: EntityID<Int>) : IntEntity(id) {
     var checkInDate by Reservations.checkInDate
     var checkOutDate by Reservations.checkOutDate
 
-    fun asDTO() = ReservationDTO(roomType.asDTO(), checkInDate, checkOutDate)
+    fun asDTO() = ReservationDTO(id.value, hotel.asLessDTO(), roomType.asDTO(), checkInDate, checkOutDate)
 }
 
 @Serializable
 data class ReservationDTO(
+    val id: Int,
+    val hotel: HotelLessDTO,
     val roomType: RoomTypeDTO,
     @Contextual val checkInDate: LocalDate,
     @Contextual val checkOutDate: LocalDate,
