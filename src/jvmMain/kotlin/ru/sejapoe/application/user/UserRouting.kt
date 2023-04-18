@@ -53,6 +53,10 @@ fun Routing.userRouting() {
         }
     }
 
+    postAuth("/ping") {
+        call.respond(HttpStatusCode.OK)
+    }
+
     postAuth("/subscribe") {
         val data = call.receive<String>()
         transaction {
