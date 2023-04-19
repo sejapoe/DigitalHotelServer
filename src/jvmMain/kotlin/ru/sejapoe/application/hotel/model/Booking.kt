@@ -8,6 +8,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.javatime.date
 import ru.sejapoe.application.user.User
+import ru.sejapoe.application.user.UserDTO
 import ru.sejapoe.application.user.Users
 import java.time.LocalDate
 
@@ -25,6 +26,7 @@ class Booking(id: EntityID<Int>) : IntEntity(id) {
     fun asDTO() = BookingDTO(
         id.value,
         hotel.asLessDTO(),
+        guest.asDTO(),
         roomType.asDTO(),
         checkInDate,
         checkOutDate,
@@ -37,6 +39,7 @@ class Booking(id: EntityID<Int>) : IntEntity(id) {
 data class BookingDTO(
     val id: Int,
     val hotel: HotelLessDTO,
+    val guest: UserDTO,
     val roomType: RoomTypeDTO,
     @Contextual val checkInDate: LocalDate,
     @Contextual val checkOutDate: LocalDate,

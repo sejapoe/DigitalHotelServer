@@ -3,6 +3,7 @@ package ru.sejapoe.application.utils
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
+import io.ktor.util.reflect.*
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -12,24 +13,24 @@ suspend fun transaction(call: ApplicationCall, block: TransactionHolder.() -> Re
     }
 
     if (responseInfo.message != null) {
-        call.respond(responseInfo.status, responseInfo.message)
+        call.respond(responseInfo.status, responseInfo.message.first, responseInfo.message.second)
     } else {
         call.respond(responseInfo.status)
     }
 }
 
-data class ResponseInfo<T>(
-    val message: T? = null,
+data class ResponseInfo<T : Any>(
+    val message: Pair<T, TypeInfo>? = null,
     val status: HttpStatusCode = HttpStatusCode.OK,
 )
 
 class TransactionHolder(val transaction: Transaction) {
-    fun <T> respond(message: T): ResponseInfo<T> {
-        return ResponseInfo(message)
+    fun <T : Any> respond(message: T, typeInfo: TypeInfo): ResponseInfo<T> {
+        return ResponseInfo(message to typeInfo)
     }
 
-    fun <T> respond(message: T, status: HttpStatusCode): ResponseInfo<T> {
-        return ResponseInfo(message, status)
+    fun <T : Any> respond(message: T, typeInfo: TypeInfo, status: HttpStatusCode): ResponseInfo<T> {
+        return ResponseInfo(message to typeInfo, status)
     }
 
     fun respond(status: HttpStatusCode): ResponseInfo<*> {

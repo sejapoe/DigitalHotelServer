@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.util.reflect.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.sejapoe.application.hotel.model.*
 import ru.sejapoe.application.utils.*
@@ -57,17 +58,22 @@ fun Routing.hotelRouting() {
     }
 
     route("/book/{hotelId}/{checkIn}/{checkOut}") {
-        get {
+        getAuth {
             val hotelId =
-                this.call.parameters["hotelId"]?.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
+                this.call.parameters["hotelId"]?.toIntOrNull() ?: return@getAuth call.respond(HttpStatusCode.BadRequest)
             val checkInDate =
-                this.call.parameters["checkIn"]?.toDate() ?: return@get call.respond(HttpStatusCode.BadRequest)
+                this.call.parameters["checkIn"]?.toDate() ?: return@getAuth call.respond(HttpStatusCode.BadRequest)
             val checkOutDate =
-                this.call.parameters["checkOut"]?.toDate() ?: return@get call.respond(HttpStatusCode.BadRequest)
+                this.call.parameters["checkOut"]?.toDate() ?: return@getAuth call.respond(HttpStatusCode.BadRequest)
             val hotel =
-                transaction { Hotel.findById(hotelId)?.asDTO() } ?: return@get call.respond(HttpStatusCode.NotFound)
+                transaction { Hotel.findById(hotelId)?.asDTO() } ?: return@getAuth call.respond(HttpStatusCode.NotFound)
             val bookableRooms =
-                getBookableRooms(hotel, checkInDate, checkOutDate).map { (type, count) -> BookableRoom(count, type) }
+                getBookableRooms(
+                    hotel,
+                    checkInDate,
+                    checkOutDate,
+                    transaction { session.user.id.value }).map { (type, count) -> BookableRoom(count, type) }
+            if (bookableRooms.isEmpty()) return@getAuth call.respond(HttpStatusCode.NotFound)
             call.respond(bookableRooms)
         }
 
@@ -86,7 +92,8 @@ fun Routing.hotelRouting() {
                 transaction { Hotel.findById(hotelId)?.asDTO() }
                     ?: return@postAuth call.respond(HttpStatusCode.NotFound)
 
-            val bookableRooms = getBookableRooms(hotel, checkInDate, checkOutDate)
+            val bookableRooms =
+                getBookableRooms(hotel, checkInDate, checkOutDate, transaction { session.user.id.value })
             val count =
                 bookableRooms.mapKeys { it.key.id }[roomTypeId] ?: return@postAuth call.respond(HttpStatusCode.NotFound)
             if (count <= 0) return@postAuth call.respond(HttpStatusCode.NotFound)
@@ -128,7 +135,7 @@ fun Routing.hotelRouting() {
             transaction(call) {
                 val booking = Booking.findById(id) ?: return@transaction respond(HttpStatusCode.NotFound)
                 if (booking.guest.id != session.user.id) return@transaction respond(HttpStatusCode.Forbidden)
-                respond(booking.asDTO())
+                respond(booking.asDTO(), typeInfo<BookingDTO>())
             }
         }
 
@@ -147,7 +154,7 @@ fun Routing.hotelRouting() {
     route("/bookings") {
         getAuth {
             transaction(call) {
-                respond(session.user.bookings.map(Booking::asDTO))
+                respond(session.user.bookings.map(Booking::asDTO), typeInfo<List<BookingDTO>>())
             }
         }
     }
@@ -156,12 +163,16 @@ fun Routing.hotelRouting() {
 private fun getBookableRooms(
     hotel: HotelDTO,
     checkInDate: LocalDate,
-    checkOutDate: LocalDate
+    checkOutDate: LocalDate,
+    id: Int
 ): Map<RoomTypeDTO, Int> {
     val rooms = hotel.rooms.filter {
         it.occupation == null || it.occupation.checkOutDate <= checkInDate
     }.groupingBy { it.type }.eachCount()
     val reservations = hotel.reservations
+    if (reservations.any {
+            it.guest.id == id && it.checkInDate <= checkOutDate && it.checkOutDate >= checkInDate
+        }) return emptyMap()
     val bookableRooms = rooms.mapValues { (type, count) ->
         max(
             count - reservations.count { reservation ->
