@@ -8,7 +8,6 @@ import io.ktor.server.routing.*
 import kotlinx.html.HTML
 import ru.sejapoe.application.hotel.hotelRouting
 import ru.sejapoe.application.index
-import ru.sejapoe.application.test.testRouting
 import ru.sejapoe.application.user.userRouting
 
 fun Application.configureRouting() {
@@ -16,7 +15,6 @@ fun Application.configureRouting() {
         // rest api
         userRouting()
         hotelRouting()
-        testRouting()
 
         // front
         get("/") {

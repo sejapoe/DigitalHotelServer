@@ -39,6 +39,13 @@ fun Route.postAuth(function: suspend AuthorizedPipeline.() -> Unit) {
     }
 }
 
+@KtorDsl
+fun Route.deleteAuth(function: suspend AuthorizedPipeline.() -> Unit) {
+    delete {
+        authorizationHandler(function)
+    }
+}
+
 
 @KtorDsl
 fun Route.getAuth(path: String, function: suspend AuthorizedPipeline.() -> Unit) {
@@ -50,6 +57,13 @@ fun Route.getAuth(path: String, function: suspend AuthorizedPipeline.() -> Unit)
 @KtorDsl
 fun Route.postAuth(path: String, function: suspend AuthorizedPipeline.() -> Unit) {
     post(path) {
+        authorizationHandler(function)
+    }
+}
+
+@KtorDsl
+fun Route.deleteAuth(path: String, function: suspend AuthorizedPipeline.() -> Unit) {
+    delete(path) {
         authorizationHandler(function)
     }
 }

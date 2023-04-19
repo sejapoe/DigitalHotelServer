@@ -7,10 +7,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.sejapoe.application.hotel.model.*
-import ru.sejapoe.application.utils.getAuth
-import ru.sejapoe.application.utils.postAuth
-import ru.sejapoe.application.utils.toDate
+import ru.sejapoe.application.utils.*
 import java.time.LocalDate
+import java.time.LocalDateTime
 import kotlin.math.max
 
 fun Routing.hotelRouting() {
@@ -57,41 +56,8 @@ fun Routing.hotelRouting() {
         }
     }
 
-    postAuth("/book/{hotelId}/{checkIn}/{checkOut}/{roomTypeId}") {
-        val hotelId =
-            this.call.parameters["hotelId"]?.toIntOrNull() ?: return@postAuth call.respond(HttpStatusCode.BadRequest)
-        val roomTypeId =
-            this.call.parameters["roomTypeId"]?.toIntOrNull() ?: return@postAuth call.respond(HttpStatusCode.BadRequest)
-        val checkOutDate =
-            this.call.parameters["checkOut"]?.toDate() ?: return@postAuth call.respond(HttpStatusCode.BadRequest)
-        val checkInDate =
-            this.call.parameters["checkIn"]?.toDate() ?: return@postAuth call.respond(HttpStatusCode.BadRequest)
-        val hotel =
-            transaction { Hotel.findById(hotelId)?.asDTO() } ?: return@postAuth call.respond(HttpStatusCode.NotFound)
-
-        val bookableRooms = getBookableRooms(hotel, checkInDate, checkOutDate)
-        val count =
-            bookableRooms.mapKeys { it.key.id }[roomTypeId] ?: return@postAuth call.respond(HttpStatusCode.NotFound)
-        if (count <= 0) return@postAuth call.respond(HttpStatusCode.NotFound)
-        transaction {
-            Reservation.new {
-                this.hotel = Hotel[hotelId]
-                this.checkInDate = checkInDate
-                this.checkOutDate = checkOutDate
-                this.roomType = RoomType[roomTypeId]
-                this.guest = this@postAuth.session.user
-            }
-        }
-        call.respond(HttpStatusCode.OK)
-    }
-
-    route("/reservations") {
-        getAuth {
-            val reservations = transaction { session.user.reservations.map(Reservation::asDTO) }
-            call.respond(HttpStatusCode.OK, reservations)
-        }
-
-        get("/{hotelId}/{checkIn}/{checkOut}") {
+    route("/book/{hotelId}/{checkIn}/{checkOut}") {
+        get {
             val hotelId =
                 this.call.parameters["hotelId"]?.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
             val checkInDate =
@@ -103,6 +69,86 @@ fun Routing.hotelRouting() {
             val bookableRooms =
                 getBookableRooms(hotel, checkInDate, checkOutDate).map { (type, count) -> BookableRoom(count, type) }
             call.respond(bookableRooms)
+        }
+
+        postAuth("/{roomTypeId}") {
+            val hotelId =
+                this.call.parameters["hotelId"]?.toIntOrNull()
+                    ?: return@postAuth call.respond(HttpStatusCode.BadRequest)
+            val roomTypeId =
+                this.call.parameters["roomTypeId"]?.toIntOrNull()
+                    ?: return@postAuth call.respond(HttpStatusCode.BadRequest)
+            val checkOutDate =
+                this.call.parameters["checkOut"]?.toDate() ?: return@postAuth call.respond(HttpStatusCode.BadRequest)
+            val checkInDate =
+                this.call.parameters["checkIn"]?.toDate() ?: return@postAuth call.respond(HttpStatusCode.BadRequest)
+            val hotel =
+                transaction { Hotel.findById(hotelId)?.asDTO() }
+                    ?: return@postAuth call.respond(HttpStatusCode.NotFound)
+
+            val bookableRooms = getBookableRooms(hotel, checkInDate, checkOutDate)
+            val count =
+                bookableRooms.mapKeys { it.key.id }[roomTypeId] ?: return@postAuth call.respond(HttpStatusCode.NotFound)
+            if (count <= 0) return@postAuth call.respond(HttpStatusCode.NotFound)
+            transaction {
+                Booking.new {
+                    this.hotel = Hotel[hotelId]
+                    this.checkInDate = checkInDate
+                    this.checkOutDate = checkOutDate
+                    roomType = RoomType[roomTypeId]
+                    guest = session.user
+                }
+            }
+            call.respond(HttpStatusCode.OK)
+        }
+
+    }
+
+    route("/booking/{id}") {
+        postAuth("/pay") {
+            // TODO: implement payment, now we just like it is paid
+            val id =
+                this.call.parameters["id"]?.toIntOrNull() ?: return@postAuth call.respond(HttpStatusCode.BadRequest)
+
+            transaction(call) {
+                val booking = Booking.findById(id) ?: return@transaction respond(HttpStatusCode.NotFound)
+                if (booking.guest.id != session.user.id) return@transaction respond(HttpStatusCode.Forbidden)
+                booking.payment = Payment.new {
+                    this.user = session.user
+                    this.amount = booking.roomType.price
+                    this.timestamp = LocalDateTime.now()
+                }
+                respond(HttpStatusCode.OK)
+            }
+        }
+
+        getAuth {
+            val id =
+                this.call.parameters["id"]?.toIntOrNull() ?: return@getAuth call.respond(HttpStatusCode.BadRequest)
+            transaction(call) {
+                val booking = Booking.findById(id) ?: return@transaction respond(HttpStatusCode.NotFound)
+                if (booking.guest.id != session.user.id) return@transaction respond(HttpStatusCode.Forbidden)
+                respond(booking.asDTO())
+            }
+        }
+
+        deleteAuth {
+            val id =
+                this.call.parameters["id"]?.toIntOrNull() ?: return@deleteAuth call.respond(HttpStatusCode.BadRequest)
+            transaction(call) {
+                val booking = Booking.findById(id) ?: return@transaction respond(HttpStatusCode.NotFound)
+                if (booking.guest.id != session.user.id) return@transaction respond(HttpStatusCode.Forbidden)
+                booking.delete()
+                respond(HttpStatusCode.OK)
+            }
+        }
+    }
+
+    route("/bookings") {
+        getAuth {
+            transaction(call) {
+                respond(session.user.bookings.map(Booking::asDTO))
+            }
         }
     }
 }
