@@ -42,11 +42,9 @@ kotlin {
             }
         }
         val jvmMain by getting {
-            kotlin.srcDir("build/generated/ksp/jvm/jvmMain/kotlin")
-
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
-                implementation("com.github.sejapoe:ktor-ksp-routing:1.0.3")
+                implementation("com.github.sejapoe:ktor-ksp-routing:1.0.6")
                 implementation("com.google.firebase:firebase-admin:7.1.1")
                 implementation("ch.qos.logback:logback-classic:1.0.0")
                 implementation("io.jsonwebtoken:jjwt-api:0.11.2")
@@ -80,7 +78,7 @@ kotlin {
 
 application {
     mainClass.set("ru.sejapoe.application.ServerKt")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=true")
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=false")
 }
 
 ktor {
@@ -98,5 +96,8 @@ tasks.named<JavaExec>("run") {
 }
 dependencies {
     implementation("io.ktor:ktor-server-call-logging-jvm:2.2.4")
-    add("kspJvm", "com.github.sejapoe:ktor-ksp-routing:1.0.3")
+    implementation("io.ktor:ktor-server-core-jvm:2.2.4")
+    implementation("io.ktor:ktor-server-host-common-jvm:2.2.4")
+    implementation("io.ktor:ktor-server-status-pages-jvm:2.2.4")
+    add("kspJvm", "com.github.sejapoe:ktor-ksp-routing:1.0.6")
 }

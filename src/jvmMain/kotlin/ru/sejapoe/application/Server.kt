@@ -4,13 +4,17 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
+import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.request.*
+import io.ktor.server.response.*
 import kotlinx.html.*
 import org.slf4j.event.Level
 import ru.sejapoe.application.db.DatabasesFactory
 import ru.sejapoe.application.plugins.configureNotifications
 import ru.sejapoe.application.plugins.configureRouting
 import ru.sejapoe.application.plugins.configureSerialization
+import ru.sejapoe.application.utils.HttpException
+import ru.sejapoe.application.utils.SessionProvider
 import ru.sejapoe.routing.KspRouting
 import java.io.File
 import java.security.KeyStore
@@ -49,7 +53,7 @@ fun main() {
                 keyStorePath = keyStoreFile
             }
         } else {
-            developmentMode = true
+            developmentMode = false
             connector {
                 port = 8080
             }
@@ -66,7 +70,14 @@ fun Application.module() {
         level = Level.INFO
         filter { call -> call.request.path().startsWith("/") }
     }
-    install(KspRouting)
+    install(KspRouting) {
+        registerProvider(SessionProvider)
+    }
+    install(StatusPages) {
+        exception<HttpException> { call, cause ->
+            call.respondText(text = cause.toString(), status = cause.code)
+        }
+    }
     configureRouting()
     configureSerialization()
     configureNotifications()
