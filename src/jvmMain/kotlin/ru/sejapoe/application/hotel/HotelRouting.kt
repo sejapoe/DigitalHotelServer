@@ -32,13 +32,13 @@ object HotelRouting {
 
 fun Routing.hotelRouting() {
     route("/hotel") {
-        get("/{id?}") {
-            val id =
-                this.call.parameters["id"]?.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
-            val hotel =
-                transaction { Hotel.findById(id)?.asDTO() } ?: return@get call.respond(HttpStatusCode.NotFound)
-            call.respond(hotel)
-        }
+//        get("/{id?}") {
+//            val id =
+//                this.call.parameters["id"]?.toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
+//            val hotel =
+//                transaction { Hotel.findById(id)?.asDTO() } ?: return@get call.respond(HttpStatusCode.NotFound)
+//            call.respond(hotel)
+//        }
 
         delete("/{id?}") {
             val id =
