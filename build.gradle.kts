@@ -4,6 +4,7 @@ plugins {
     kotlin("multiplatform") version "1.8.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0"
     id("io.ktor.plugin") version "2.2.4"
+    id("com.google.devtools.ksp") version "1.8.20-1.0.11"
     application
 }
 
@@ -13,6 +14,7 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven")
+    maven("https://jitpack.io")
 }
 kotlin {
     jvm {
@@ -41,6 +43,8 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
+//                implementation("ru.sejapoe.routing:routing:1.0.0")
+                implementation("com.github.sejapoe:ktor-ksp-routing:1.0.1")
                 implementation("com.google.firebase:firebase-admin:7.1.1")
                 implementation("ch.qos.logback:logback-classic:1.0.0")
                 implementation("io.jsonwebtoken:jjwt-api:0.11.2")
@@ -91,4 +95,5 @@ tasks.named<JavaExec>("run") {
 }
 dependencies {
     implementation("io.ktor:ktor-server-call-logging-jvm:2.2.4")
+    add("kspJvm", "com.github.sejapoe:ktor-ksp-routing:1.0.1")
 }

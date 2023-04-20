@@ -11,6 +11,7 @@ import ru.sejapoe.application.db.DatabasesFactory
 import ru.sejapoe.application.plugins.configureNotifications
 import ru.sejapoe.application.plugins.configureRouting
 import ru.sejapoe.application.plugins.configureSerialization
+import ru.sejapoe.routing.KspRouting
 import java.io.File
 import java.security.KeyStore
 
@@ -65,6 +66,7 @@ fun Application.module() {
         level = Level.INFO
         filter { call -> call.request.path().startsWith("/") }
     }
+    install(KspRouting)
     configureRouting()
     configureSerialization()
     configureNotifications()
