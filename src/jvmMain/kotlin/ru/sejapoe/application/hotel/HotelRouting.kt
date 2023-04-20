@@ -2,15 +2,32 @@ package ru.sejapoe.application.hotel
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.sejapoe.application.hotel.model.*
 import ru.sejapoe.application.utils.*
+import ru.sejapoe.routing.Get
+import ru.sejapoe.routing.Response
+import ru.sejapoe.routing.Route
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.max
+
+@Route("")
+object HotelRouting {
+    @Route("/hotel")
+    object HotelRouting {
+        @Get("/{id}")
+        fun getHotel(id: Int): Response<HotelDTO> {
+            val hotel =
+                transaction { Hotel.findById(id)?.asDTO() } ?: throw NotFoundException()
+            return Response(data = hotel)
+        }
+    }
+}
 
 fun Routing.hotelRouting() {
     route("/hotel") {
