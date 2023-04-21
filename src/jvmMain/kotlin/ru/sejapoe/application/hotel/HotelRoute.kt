@@ -12,23 +12,16 @@ import ru.sejapoe.routing.*
 @Route("/hotel")
 object HotelRoute {
     @Get("/{id}")
-    fun getHotel(id: Int): Response<HotelDTO> {
-        val hotel =
-            transaction { Hotel.findById(id)?.asDTO() } ?: throw HttpStatusCode.NotFound.exception()
-        return Response(data = hotel)
-    }
+    fun getHotel(id: Int) = transaction { Hotel.findById(id)?.asDTO() ?: throw HttpStatusCode.NotFound.exception() }
 
     @Delete("/{id}")
     fun deleteHotel(id: Int) = transaction { Hotel.findById(id)?.delete() ?: throw HttpStatusCode.NotFound.exception() }
 
     @Get("s")
-    fun getHotels(): Response<List<HotelLessDTO>> {
-        val hotels = transaction { Hotel.all().map(Hotel::asLessDTO) }
-        return Response(data = hotels)
-    }
+    fun getHotels() = transaction { Hotel.all().map(Hotel::asLessDTO) }
 
     @Post("s")
-    fun createHotel(hotelDTO: HotelDTO): Response<Unit> {
+    fun createHotel(hotelDTO: HotelDTO){
         transaction {
             val hotel = Hotel.new {
                 name = hotelDTO.name
@@ -44,7 +37,7 @@ object HotelRoute {
                 }
             }
         }
-        return Response(HttpStatusCode.Created)
+        throw HttpStatusCode.Created.exception()
     }
 }
 

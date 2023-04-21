@@ -15,6 +15,7 @@ import ru.sejapoe.application.plugins.configureRouting
 import ru.sejapoe.application.plugins.configureSerialization
 import ru.sejapoe.application.utils.HttpException
 import ru.sejapoe.application.utils.SessionProvider
+import ru.sejapoe.application.utils.toDate
 import ru.sejapoe.routing.KspRouting
 import java.io.File
 import java.security.KeyStore
@@ -72,6 +73,8 @@ fun Application.module() {
     }
     install(KspRouting) {
         registerProvider(SessionProvider)
+        
+        registerConverter(String::toDate)
     }
     install(StatusPages) {
         exception<HttpException> { call, cause ->

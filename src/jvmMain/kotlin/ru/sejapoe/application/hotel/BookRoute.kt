@@ -4,9 +4,11 @@ import io.ktor.http.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.sejapoe.application.hotel.model.*
 import ru.sejapoe.application.user.Session
-import ru.sejapoe.application.utils.LocalDateConverter
 import ru.sejapoe.application.utils.exception
-import ru.sejapoe.routing.*
+import ru.sejapoe.routing.Get
+import ru.sejapoe.routing.Post
+import ru.sejapoe.routing.Provided
+import ru.sejapoe.routing.Route
 import java.time.LocalDate
 import kotlin.math.max
 
@@ -15,10 +17,10 @@ object BookRoute {
     @Get
     fun getBookableRooms(
         hotelId: Int,
-        @Converter(LocalDateConverter::class) checkIn: LocalDate,
-        @Converter(LocalDateConverter::class) checkOut: LocalDate,
+        checkIn: LocalDate,
+        checkOut: LocalDate,
         @Provided session: Session
-    ): Response<List<BookableRoom>> {
+    ): List<BookableRoom> {
         val hotel =
             transaction { Hotel.findById(hotelId)?.asDTO() } ?: throw HttpStatusCode.NotFound.exception()
         val bookableRooms =
@@ -28,14 +30,14 @@ object BookRoute {
                 checkOut,
                 transaction { session.user.id.value }).map { (type, count) -> BookableRoom(count, type) }
         if (bookableRooms.isEmpty()) throw HttpStatusCode.NotFound.exception()
-        return Response(data = bookableRooms)
+        return bookableRooms
     }
 
     @Post("/{roomTypeId}")
     fun book(
         hotelId: Int,
-        @Converter(LocalDateConverter::class) checkIn: LocalDate,
-        @Converter(LocalDateConverter::class) checkOut: LocalDate,
+        checkIn: LocalDate,
+        checkOut: LocalDate,
         roomTypeId: Int,
         @Provided session: Session
     ) {

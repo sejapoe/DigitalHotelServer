@@ -3,7 +3,10 @@ package ru.sejapoe.application.user
 import io.ktor.http.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.sejapoe.application.utils.exception
-import ru.sejapoe.routing.*
+import ru.sejapoe.routing.Get
+import ru.sejapoe.routing.Post
+import ru.sejapoe.routing.Provided
+import ru.sejapoe.routing.Route
 import java.math.BigInteger
 
 @Route
@@ -11,46 +14,37 @@ object UserRoute {
     @Route("/register")
     object Register {
         @Post("/start")
-        fun start(data: Pair<String, String>): Response<String> {
+        fun start(data: Pair<String, String>) =
             try {
-                val bitArray256 = startRegistration(data)
-                return Response(data = bitArray256.asBase64())
+                startRegistration(data).asBase64()
             } catch (e: UserAlreadyExists) {
                 throw HttpStatusCode.Found.exception()
             } catch (e: Exception) {
                 e.printStackTrace()
                 throw HttpStatusCode.InternalServerError.exception(e.localizedMessage)
             }
-        }
 
         @Post("/finish")
-        fun finishRegistration(data: Pair<String, BigInteger>) {
-            finishRegistration(data)
-        }
+        fun finish(data: Pair<String, BigInteger>) = finishRegistration(data)
     }
 
     @Route("/login")
     object Login {
         @Post("/start")
-        fun start(data: Pair<String, BigInteger>): Response<Pair<String, BigInteger>> {
-            try {
-                val login = login(data)
-                return Response(data = login)
-            } catch (e: NoSuchUser) {
-                throw HttpStatusCode.NotFound.exception()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                throw HttpStatusCode.InternalServerError.exception(e.localizedMessage)
-            }
+        fun start(data: Pair<String, BigInteger>) = try {
+            login(data)
+        } catch (e: NoSuchUser) {
+            throw HttpStatusCode.NotFound.exception()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw HttpStatusCode.InternalServerError.exception(e.localizedMessage)
         }
 
         @Post("/finish")
-        fun finishLogin(data: String): Response<Int> {
-            try {
-                return Response(data = confirm(data))
-            } catch (e: WrongPasswordException) {
-                throw HttpStatusCode.Forbidden.exception()
-            }
+        fun finish(data: String) = try {
+            confirm(data)
+        } catch (e: WrongPasswordException) {
+            throw HttpStatusCode.Forbidden.exception()
         }
     }
 
@@ -58,17 +52,9 @@ object UserRoute {
     fun ping(@Provided session: Session) = Unit
 
     @Post("/subscribe")
-    fun subscribe(data: String, @Provided session: Session) {
-        transaction {
-            session.notificationToken = data
-        }
-    }
+    fun subscribe(data: String, @Provided session: Session) = transaction { session.notificationToken = data }
 
     @Post("/logout")
-    fun logout(@Provided session: Session) {
-        transaction {
-            session.delete()
-        }
-    }
+    fun logout(@Provided session: Session) = transaction { session.delete() }
 }
 
