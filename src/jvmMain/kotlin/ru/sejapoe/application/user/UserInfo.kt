@@ -17,9 +17,10 @@ class UserInfo(id: EntityID<Int>) : IntEntity(id) {
     var parentheses by UserInfos.parentheses
     var phoneNumber by UserInfos.phoneNumber
     var birthDate by UserInfos.birthDate
+    var sex by UserInfos.sex
     val documents by Document referrersOn Documents.userInfoId
 
-    fun asDTO() = UserInfoDTO(id.value, firstName, lastName, parentheses, phoneNumber, birthDate)
+    fun asDTO() = UserInfoDTO(id.value, firstName, lastName, parentheses, phoneNumber, birthDate, sex)
 }
 
 @Serializable
@@ -29,7 +30,8 @@ data class UserInfoDTO(
     val lastName: String,
     val parentheses: String?,
     val phoneNumber: String,
-    @Contextual val birthDate: LocalDate
+    @Contextual val birthDate: LocalDate,
+    val sex: Sex
 )
 
 object UserInfos : IntIdTable() {
