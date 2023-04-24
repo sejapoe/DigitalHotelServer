@@ -1,34 +1,26 @@
 package ru.sejapoe.application.utils
 
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.JwsHeader
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SigningKeyResolver
+import io.jsonwebtoken.*
 import io.jsonwebtoken.security.Keys
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.util.pipeline.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.sejapoe.application.user.Session
+import ru.sejapoe.routing.Provider
 import java.security.Key
 
 private fun getKey(subject: String): Key {
     return transaction {
-        val session = Session.findById(subject.toInt()) ?: throw AuthorizationError()
+        val session = Session.findById(subject.toInt()) ?: throw HttpStatusCode.Unauthorized.exception()
         Keys.hmacShaKeyFor(session.sessionKey.bytes)
     }
 }
 
-class AuthorizationError : Exception()
-
-fun Route.postAuth(path: String, function: suspend AuthorizedPipeline.() -> Unit) {
-    post(path) {
+object SessionProvider : Provider<Session> {
+    override suspend fun provide(call: ApplicationCall): Session {
         val authorization =
-            call.request.header("Authorization") ?: return@post call.respond(HttpStatusCode.Unauthorized)
-        println(authorization)
+            call.request.header("Authorization") ?: throw HttpStatusCode.Unauthorized.exception()
         val token = authorization.split(" ")[1]
         val parser = Jwts.parserBuilder().setSigningKeyResolver(
             object : SigningKeyResolver {
@@ -36,26 +28,19 @@ fun Route.postAuth(path: String, function: suspend AuthorizedPipeline.() -> Unit
                     return getKey(claims!!.subject)
                 }
 
-
                 override fun resolveSigningKey(header: JwsHeader<*>?, plaintext: String?): Key {
-                    throw AuthorizationError()
+                    throw UnsupportedJwtException("Unsupported JWT")
                 }
-
             }
         ).build()
         val id = try {
             parser.parseClaimsJws(token).body.subject
         } catch (e: Exception) {
-            return@post call.respond(HttpStatusCode.Unauthorized)
+            throw HttpStatusCode.Unauthorized.exception()
         }.toInt()
         val session = transaction {
             Session.findById(id)
-        } ?: return@post call.respond(HttpStatusCode.Unauthorized)
-        function(AuthorizedPipeline(session, this))
+        } ?: throw HttpStatusCode.Unauthorized.exception()
+        return session
     }
-}
-
-class AuthorizedPipeline(val session: Session, private val pipeline: PipelineContext<Unit, ApplicationCall>) {
-    val call
-        get() = pipeline.call
 }

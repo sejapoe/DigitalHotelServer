@@ -23,13 +23,24 @@ object DatabasesFactory {
         transaction {
             addLogger(StdOutSqlLogger)
 
+            SchemaUtils.create(Payments)
             SchemaUtils.create(Users)
             SchemaUtils.create(Sessions)
             SchemaUtils.create(Hotels)
-            SchemaUtils.create(Reservations)
+            SchemaUtils.create(Bookings)
             SchemaUtils.create(Rooms)
             SchemaUtils.create(RoomTypes)
             SchemaUtils.create(Occupations)
+            SchemaUtils.createMissingTablesAndColumns(
+                Users,
+                Sessions,
+                Payments,
+                Hotels,
+                Bookings,
+                Rooms,
+                RoomTypes,
+                Occupations
+            ) // TODO: remove when production
         }
     }
 }

@@ -12,7 +12,7 @@ class Hotel(id: EntityID<Int>) : IntEntity(id) {
     var name by Hotels.name
     val roomTypes by RoomType referrersOn RoomTypes.hotel
     val rooms by Room referrersOn Rooms.hotel
-    val reservations by Reservation referrersOn Reservations.hotel
+    val reservations by Booking referrersOn Bookings.hotel
 
     fun asDTO() = HotelDTO(
         id.value,
@@ -30,7 +30,7 @@ data class HotelDTO(
     val name: String,
     val roomTypes: List<RoomTypeDTO>,
     val rooms: List<RoomDTO>,
-    val reservations: List<ReservationDTO>
+    val reservations: List<BookingDTO>
 )
 
 @Serializable
