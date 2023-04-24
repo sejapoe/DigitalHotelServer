@@ -7,6 +7,8 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import ru.sejapoe.application.hotel.model.Booking
 import ru.sejapoe.application.hotel.model.Bookings
+import ru.sejapoe.application.hotel.model.Occupation
+import ru.sejapoe.application.hotel.model.Occupations
 import ru.sejapoe.application.utils.BitArray256
 
 class User(id: EntityID<Int>) : IntEntity(id) {
@@ -16,6 +18,7 @@ class User(id: EntityID<Int>) : IntEntity(id) {
     var salt by Users.salt.transform({ it.bytes }, { BitArray256(it) })
     var verifier by Users.verifier.transform({ it.toString() }, { it.toBigInteger() })
     val bookings by Booking referrersOn Bookings.guest
+    val occupations by Occupation referrersOn Occupations.guest
 
     fun asDTO() = UserDTO(id.value, username)
 }

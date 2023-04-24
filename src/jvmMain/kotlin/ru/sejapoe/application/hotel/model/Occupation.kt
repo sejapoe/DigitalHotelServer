@@ -20,11 +20,13 @@ class Occupation(id: EntityID<Int>) : IntEntity(id) {
     var checkInDate by Occupations.checkInDate
     var checkOutDate by Occupations.checkOutDate
 
-    fun asDTO() = OccupationDTO(checkInDate, checkOutDate)
+    fun asDTO() = OccupationDTO(id.value, room.asLessDTO(), checkInDate, checkOutDate)
 }
 
 @Serializable
 data class OccupationDTO(
+    val id: Int,
+    val room: RoomLessDTO,
     @Contextual val checkInDate: LocalDate,
     @Contextual val checkOutDate: LocalDate,
 )
