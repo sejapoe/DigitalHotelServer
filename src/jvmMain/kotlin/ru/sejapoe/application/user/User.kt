@@ -20,7 +20,7 @@ class User(id: EntityID<Int>) : IntEntity(id) {
     var verifier by Users.verifier.transform({ it.toString() }, { it.toBigInteger() })
     val bookings by Booking referrersOn Bookings.guest
     val occupations by Occupation referrersOn Occupations.guest
-    val userInfo by UserInfo optionalReferencedOn Users.userInfo
+    var userInfo by UserInfo optionalReferencedOn Users.userInfo
 
     fun asDTO() = UserDTO(id.value, username, userInfo?.asDTO())
 }
