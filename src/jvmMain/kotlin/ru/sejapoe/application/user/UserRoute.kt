@@ -56,5 +56,16 @@ object UserRoute {
 
     @Post("/logout")
     fun logout(@Provided session: Session) = transaction { session.delete() }
+
+    @Post("/user/info")
+    fun setUserInfo(data: UserInfoDTO, @Provided session: Session) = transaction {
+        session.user.userInfo = UserInfo.new {
+            this.firstName = data.firstName
+            this.lastName = data.lastName
+            this.parentheses = data.parentheses
+            this.phoneNumber = data.phoneNumber
+            this.birthDate = data.birthDate
+        }
+    }
 }
 
