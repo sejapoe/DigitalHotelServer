@@ -15,6 +15,7 @@ object BookingRoute {
     @Post("/{id}/checkIn")
     fun checkIn(id: Int, @Provided session: Session) =
         transaction {
+            if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception()
             val booking = Booking.findById(id) ?: throw HttpStatusCode.NotFound.exception()
             if (booking.guest.id != session.user.id) throw HttpStatusCode.Forbidden.exception()
             if (booking.payment == null) throw HttpStatusCode.PaymentRequired.exception()
@@ -34,6 +35,7 @@ object BookingRoute {
     @Post("/{id}/pay")
     fun pay(id: Int, @Provided session: Session) {
         transaction {
+            if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception()
             val booking = Booking.findById(id) ?: throw HttpStatusCode.NotFound.exception()
             if (booking.guest.id != session.user.id) throw HttpStatusCode.Forbidden.exception()
             booking.payment = Payment.new {
@@ -46,6 +48,7 @@ object BookingRoute {
 
     @Get("/{id}")
     fun getBooking(id: Int, @Provided session: Session) = transaction {
+        if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception()
         val booking = Booking.findById(id)?.asDTO() ?: throw HttpStatusCode.NotFound.exception()
         if (booking.guest.id != session.user.id.value) throw HttpStatusCode.Forbidden.exception()
         booking
@@ -53,11 +56,15 @@ object BookingRoute {
 
     @Delete("/{id}")
     fun deleteBooking(id: Int, @Provided session: Session) = transaction {
+        if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception()
         val booking = Booking.findById(id) ?: throw HttpStatusCode.NotFound.exception()
         if (booking.guest.id != session.user.id) throw HttpStatusCode.Forbidden.exception()
         booking.delete()
     }
 
     @Get("s")
-    fun getBookings(@Provided session: Session) = transaction { session.user.bookings.map(Booking::asDTO) }
+    fun getBookings(@Provided session: Session) = transaction {
+        if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception()
+        session.user.bookings.map(Booking::asDTO)
+    }
 }

@@ -21,6 +21,7 @@ object BookRoute {
         checkOut: LocalDate,
         @Provided session: Session
     ): List<BookableRoom> {
+        if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception()
         val hotel =
             transaction { Hotel.findById(hotelId)?.asDTO() } ?: throw HttpStatusCode.NotFound.exception()
         val bookableRooms =
@@ -41,8 +42,8 @@ object BookRoute {
         roomTypeId: Int,
         @Provided session: Session
     ) {
+        if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception()
         val hotel = transaction { Hotel.findById(hotelId)?.asDTO() } ?: throw HttpStatusCode.NotFound.exception()
-
         val bookableRooms =
             getBookableRooms(hotel, checkIn, checkOut, transaction { session.user.id.value })
         val count =

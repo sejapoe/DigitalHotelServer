@@ -1,5 +1,6 @@
 package ru.sejapoe.application.user
 
+//import ru.sejapoe.application.db.Compound
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
@@ -19,15 +20,22 @@ class User(id: EntityID<Int>) : IntEntity(id) {
     var verifier by Users.verifier.transform({ it.toString() }, { it.toBigInteger() })
     val bookings by Booking referrersOn Bookings.guest
     val occupations by Occupation referrersOn Occupations.guest
+    val userInfo by UserInfo optionalReferencedOn Users.userInfo
 
-    fun asDTO() = UserDTO(id.value, username)
+    fun asDTO() = UserDTO(id.value, username, userInfo?.asDTO())
 }
 
 @Serializable
-data class UserDTO(val id: Int, val username: String)
+data class UserDTO(val id: Int, val username: String, val userInfo: UserInfoDTO?)
+
 
 object Users : IntIdTable() {
     val username = varchar("username", 128).uniqueIndex()
     val salt = binary("salt", 32)
     val verifier = varchar("verifier", 128)
+    val userInfo = reference("user_info_id", UserInfos).nullable()
+}
+
+enum class Sex {
+    MALE, FEMALE
 }

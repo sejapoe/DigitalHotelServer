@@ -22,6 +22,7 @@ object RoomRoute {
     @Post("/{id}/open")
     fun openRoom(id: Int, @Provided session: Session, @Pipeline pipeline: PipelineContext<Unit, ApplicationCall>) {
         transaction {
+            if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception()
             val room = Room.findById(id) ?: throw HttpStatusCode.NotFound.exception()
             if (room.occupation?.guest?.id != session.user.id) throw HttpStatusCode.Forbidden.exception()
             room.isOpen = true
