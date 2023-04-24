@@ -49,7 +49,8 @@ object UserRoute {
     }
 
     @Get("/ping")
-    fun ping(@Provided session: Session) = Unit
+    fun ping(@Provided session: Session) =
+        transaction { if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception() }
 
     @Post("/subscribe")
     fun subscribe(data: String, @Provided session: Session) = transaction { session.notificationToken = data }
