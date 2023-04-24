@@ -33,7 +33,7 @@ object BookingRoute {
 
 
     @Post("/{id}/pay")
-    fun pay(id: Int, @Provided session: Session) {
+    fun pay(id: Int, @Provided session: Session) =
         transaction {
             if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception()
             val booking = Booking.findById(id) ?: throw HttpStatusCode.NotFound.exception()
@@ -44,7 +44,6 @@ object BookingRoute {
                 this.timestamp = LocalDateTime.now()
             }
         }
-    }
 
     @Get("/{id}")
     fun getBooking(id: Int, @Provided session: Session) = transaction {

@@ -20,19 +20,20 @@ object BookRoute {
         checkIn: LocalDate,
         checkOut: LocalDate,
         @Provided session: Session
-    ): List<BookableRoom> {
+    ): List<BookableRoom> = transaction {
         if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception()
-        val hotel =
-            transaction { Hotel.findById(hotelId)?.asDTO() } ?: throw HttpStatusCode.NotFound.exception()
+        val hotel = Hotel.findById(hotelId)?.asDTO() ?: throw HttpStatusCode.NotFound.exception()
         val bookableRooms =
             getBookableRooms(
                 hotel,
                 checkIn,
                 checkOut,
-                transaction { session.user.id.value }).map { (type, count) -> BookableRoom(count, type) }
+                session.user.id.value
+            ).map { (type, count) -> BookableRoom(count, type) }
         if (bookableRooms.isEmpty()) throw HttpStatusCode.NotFound.exception()
-        return bookableRooms
+        bookableRooms
     }
+
 
     @Post("/{roomTypeId}")
     fun book(
@@ -41,15 +42,15 @@ object BookRoute {
         checkOut: LocalDate,
         roomTypeId: Int,
         @Provided session: Session
-    ) {
-        if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception()
-        val hotel = transaction { Hotel.findById(hotelId)?.asDTO() } ?: throw HttpStatusCode.NotFound.exception()
-        val bookableRooms =
-            getBookableRooms(hotel, checkIn, checkOut, transaction { session.user.id.value })
-        val count =
-            bookableRooms.mapKeys { it.key.id }[roomTypeId] ?: throw HttpStatusCode.NotFound.exception()
-        if (count <= 0) throw HttpStatusCode.NotFound.exception()
+    ) =
         transaction {
+            if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception()
+            val hotel = Hotel.findById(hotelId)?.asDTO() ?: throw HttpStatusCode.NotFound.exception()
+            val bookableRooms =
+                getBookableRooms(hotel, checkIn, checkOut, session.user.id.value)
+            val count =
+                bookableRooms.mapKeys { it.key.id }[roomTypeId] ?: throw HttpStatusCode.NotFound.exception()
+            if (count <= 0) throw HttpStatusCode.NotFound.exception()
             Booking.new {
                 this.hotel = Hotel[hotelId]
                 this.checkInDate = checkIn
@@ -58,7 +59,6 @@ object BookRoute {
                 guest = session.user
             }
         }
-    }
 
     private fun getBookableRooms(
         hotel: HotelDTO,
