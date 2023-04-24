@@ -65,6 +65,7 @@ object UserRoute {
             this.parentheses = data.parentheses
             this.phoneNumber = data.phoneNumber
             this.birthDate = data.birthDate
+            this.sex = data.sex
         }
     }
 }
