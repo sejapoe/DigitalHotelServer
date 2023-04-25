@@ -27,6 +27,7 @@ object BookingRoute {
                 room = Room.find { Rooms.type eq booking.roomType.id }.firstOrNull()
                     ?: throw HttpStatusCode.Conflict.exception()
             }
+            occupation.room.occupation = occupation
             booking.delete()
             occupation.id.value
         }
