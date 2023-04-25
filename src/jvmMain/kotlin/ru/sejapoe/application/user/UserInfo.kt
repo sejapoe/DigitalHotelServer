@@ -42,3 +42,7 @@ object UserInfos : IntIdTable() {
     val birthDate = date("birth_date")
     val sex = enumeration<Sex>("sex")
 }
+
+enum class Sex {
+    MALE, FEMALE
+}

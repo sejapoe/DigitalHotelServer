@@ -48,6 +48,9 @@ object UserRoute {
         }
     }
 
+    @Get("/user")
+    fun getUser(@Provided session: Session) = transaction { session.user.asDTO() }
+
     @Get("/ping")
     fun ping(@Provided session: Session) =
         transaction { if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception() }

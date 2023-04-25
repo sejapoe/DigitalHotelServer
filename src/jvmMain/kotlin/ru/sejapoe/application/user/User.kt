@@ -1,6 +1,5 @@
 package ru.sejapoe.application.user
 
-//import ru.sejapoe.application.db.Compound
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
@@ -34,8 +33,4 @@ object Users : IntIdTable() {
     val salt = binary("salt", 32)
     val verifier = varchar("verifier", 128)
     val userInfo = reference("user_info_id", UserInfos).nullable()
-}
-
-enum class Sex {
-    MALE, FEMALE
 }
