@@ -19,6 +19,8 @@ class UserInfo(id: EntityID<Int>) : IntEntity(id) {
     var birthDate by UserInfos.birthDate
     var sex by UserInfos.sex
     val documents by Document referrersOn Documents.userInfoId
+    val fullName
+        get() = "$lastName $firstName $parentheses"
 
     fun asDTO() = UserInfoDTO(id.value, firstName, lastName, parentheses, phoneNumber, birthDate, sex)
 }

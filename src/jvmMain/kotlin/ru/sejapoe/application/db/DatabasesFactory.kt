@@ -6,7 +6,9 @@ import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.sejapoe.application.hotel.model.*
+import ru.sejapoe.application.user.Friendships
 import ru.sejapoe.application.user.Sessions
+import ru.sejapoe.application.user.UserInfos
 import ru.sejapoe.application.user.Users
 
 private const val productionUrl = "jdbc:postgresql://db:5432/test?user=postgres"
@@ -31,6 +33,8 @@ object DatabasesFactory {
             SchemaUtils.create(Rooms)
             SchemaUtils.create(RoomTypes)
             SchemaUtils.create(Occupations)
+            SchemaUtils.create(Friendships)
+            SchemaUtils.create(UserInfos)
             SchemaUtils.createMissingTablesAndColumns(
                 Users,
                 Sessions,
@@ -39,7 +43,9 @@ object DatabasesFactory {
                 Bookings,
                 Rooms,
                 RoomTypes,
-                Occupations
+                Occupations,
+                Friendships,
+                UserInfos
             ) // TODO: remove when production
         }
     }
