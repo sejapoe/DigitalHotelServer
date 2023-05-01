@@ -33,7 +33,7 @@ object FriendRoute {
         }
         AndroidNotification.builder()
             .setTitleLocalizationKey("new_friend_request_title")
-            .setTitleLocalizationKey("new_friend_request_body")
+            .setBodyLocalizationKey("new_friend_request_body")
             .addBodyLocalizationArg(session.user.asLessDTO().fullName ?: "unknown")
             .build()
             .notify(target.notificationTokens)
