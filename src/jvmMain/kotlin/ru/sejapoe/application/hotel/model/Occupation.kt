@@ -19,6 +19,7 @@ class Occupation(id: EntityID<Int>) : IntEntity(id) {
     var room by Room referencedOn Occupations.room
     var checkInDate by Occupations.checkInDate
     var checkOutDate by Occupations.checkOutDate
+    val sharedAccesses by SharedAccess referrersOn SharedAccesses.occupation
 
     fun asDTO() = OccupationDTO(id.value, room.asLessDTO(), checkInDate, checkOutDate)
 }

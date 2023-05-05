@@ -35,6 +35,7 @@ object DatabasesFactory {
             SchemaUtils.create(Occupations)
             SchemaUtils.create(Friendships)
             SchemaUtils.create(UserInfos)
+            SchemaUtils.create(SharedAccesses)
             SchemaUtils.createMissingTablesAndColumns(
                 Users,
                 Sessions,
@@ -45,7 +46,8 @@ object DatabasesFactory {
                 RoomTypes,
                 Occupations,
                 Friendships,
-                UserInfos
+                UserInfos,
+                SharedAccesses
             ) // TODO: remove when production
         }
     }
