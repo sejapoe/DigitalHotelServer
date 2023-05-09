@@ -6,6 +6,7 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import ru.sejapoe.application.user.User
+import ru.sejapoe.application.user.UserLessDTO
 import ru.sejapoe.application.user.Users
 import kotlin.experimental.and
 import kotlin.experimental.or
@@ -17,7 +18,7 @@ class SharedAccess(id: EntityID<Int>) : IntEntity(id) {
     var user by User referencedOn SharedAccesses.user
     var rights by SharedAccesses.rights.transform(RightsComposition::value, ::RightsComposition)
     var budget by SharedAccesses.budget
-    fun asDTO() = SharedAccessDTO(id.value)
+    fun asDTO() = SharedAccessDTO(id.value, rights.value, user.asLessDTO(), budget ?: -1)
 }
 
 enum class Rights(val value: Short) {
@@ -38,7 +39,7 @@ data class RightsComposition(val value: Short) {
 }
 
 @Serializable
-data class SharedAccessDTO(val id: Int)
+data class SharedAccessDTO(val id: Int, val rightValue: Short, val user: UserLessDTO, val budget: Int)
 
 object SharedAccesses : IntIdTable() {
     val occupation = reference("occupation", Occupations)
