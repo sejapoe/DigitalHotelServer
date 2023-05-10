@@ -29,7 +29,7 @@ object RoomRoute {
                     session.user,
                     Rights.ACCESS_ROOM
                 ) != true
-            ) throw HttpStatusCode.Forbidden.exception()
+            ) throw HttpStatusCode.Forbidden.exception("loh")
             room.isOpen = true
             FirebaseMessaging.getInstance().sendMulticast(
                 MulticastMessage.builder()

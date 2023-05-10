@@ -29,7 +29,7 @@ enum class Rights(val value: Short) {
 }
 
 data class RightsComposition(val value: Short) {
-    fun satisfy(right: Rights) = (value and right.value) == 0.toShort()
+    fun satisfy(right: Rights) = (value and right.value) != 0.toShort()
     fun satisfyAll(vararg rights: Rights) = rights.all(::satisfy)
 
     companion object {

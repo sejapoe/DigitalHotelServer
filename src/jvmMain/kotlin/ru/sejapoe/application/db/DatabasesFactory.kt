@@ -25,17 +25,7 @@ object DatabasesFactory {
         transaction {
             addLogger(StdOutSqlLogger)
 
-            SchemaUtils.create(Payments)
-            SchemaUtils.create(Users)
-            SchemaUtils.create(Sessions)
-            SchemaUtils.create(Hotels)
-            SchemaUtils.create(Bookings)
-            SchemaUtils.create(Rooms)
-            SchemaUtils.create(RoomTypes)
-            SchemaUtils.create(Occupations)
-            SchemaUtils.create(Friendships)
-            SchemaUtils.create(UserInfos)
-            SchemaUtils.create(SharedAccesses)
+            SchemaUtils.drop(SharedAccesses)
             SchemaUtils.createMissingTablesAndColumns(
                 Users,
                 Sessions,

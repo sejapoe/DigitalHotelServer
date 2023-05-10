@@ -52,7 +52,7 @@ object AccessSharingRoute {
     @Get("/share/{shareId}")
     fun getShare(shareId: Int, @Provided session: Session) = transaction {
         val share = SharedAccess.findById(shareId) ?: throw HttpStatusCode.NotFound.exception()
-        if (share.occupation.guest != session.user) throw HttpStatusCode.Forbidden.exception("loh")
+        if (share.occupation.guest != session.user) throw HttpStatusCode.Forbidden.exception()
         share.asDTO()
     }
 
