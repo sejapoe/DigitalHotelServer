@@ -16,15 +16,15 @@ import ru.sejapoe.application.utils.notify
 import ru.sejapoe.routing.*
 
 @Suppress("UNUSED")
-@Route("/room/{id}/share")
+@Route
 object AccessSharingRoute {
-    @Get("s")
+    @Get("/room/{id}/shares")
     fun getSharedAccesses(id: Int, @Provided session: Session) = transaction {
         val occupation = getOccupation(id, session)
         occupation.sharedAccesses.map(SharedAccess::asDTO)
     }
 
-    @Post("s")
+    @Post("/room/{id}/shares")
     fun shareAccess(id: Int, @Body usernames: List<String>, @Provided session: Session) = transaction {
         val occupation = getOccupation(id, session)
         val targetUsers = usernames.map {
@@ -49,22 +49,25 @@ object AccessSharingRoute {
             .notify(targetUsers.flatMap(User::notificationTokens))
     }
 
-    @Put("/{shareId}")
-    fun editShare(id: Int, shareId: Int, @Body edit: AccessShareEdit, @Provided session: Session) = transaction {
-        val occupation = getOccupation(id, session)
+    @Get("/share/{shareId}")
+    fun getShare(shareId: Int, @Provided session: Session) = transaction {
         val share = SharedAccess.findById(shareId) ?: throw HttpStatusCode.NotFound.exception()
-        if (occupation.sharedAccesses.all { it != share }) throw HttpStatusCode.Forbidden.exception()
+        if (share.occupation.guest != session.user) throw HttpStatusCode.Forbidden.exception("loh")
+        share.asDTO()
+    }
 
+    @Put("/share/{shareId}")
+    fun editShare(shareId: Int, @Body edit: AccessShareEdit, @Provided session: Session) = transaction {
+        val share = SharedAccess.findById(shareId) ?: throw HttpStatusCode.NotFound.exception()
+        if (share.occupation.guest != session.user) throw HttpStatusCode.Forbidden.exception()
         share.budget = edit.budget
         share.rights = RightsComposition(edit.rights)
     }
 
-    @Delete("/{shareId}")
-    fun editShare(id: Int, shareId: Int, @Provided session: Session) = transaction {
-        val occupation = getOccupation(id, session)
+    @Delete("/share/{shareId}")
+    fun editShare(shareId: Int, @Provided session: Session) = transaction {
         val share = SharedAccess.findById(shareId) ?: throw HttpStatusCode.NotFound.exception()
-        if (occupation.sharedAccesses.all { it != share }) throw HttpStatusCode.Forbidden.exception()
-
+        if (share.occupation.guest != session.user) throw HttpStatusCode.Forbidden.exception()
         share.delete()
     }
 
@@ -79,5 +82,5 @@ object AccessSharingRoute {
     }
 
     @Serializable
-    data class AccessShareEdit(val rights: Short, val budget: Int?)
+    data class AccessShareEdit(val rights: Short, val budget: Int)
 }

@@ -1,13 +1,14 @@
 package ru.sejapoe.application.hotel
 
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.Message
+import com.google.firebase.messaging.MulticastMessage
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.util.pipeline.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.transactions.transaction
+import ru.sejapoe.application.hotel.model.Rights
 import ru.sejapoe.application.hotel.model.Room
 import ru.sejapoe.application.user.Session
 import ru.sejapoe.application.utils.exception
@@ -24,18 +25,28 @@ object RoomRoute {
         transaction {
             if (session.user.userInfo == null) throw HttpStatusCode.Forbidden.exception()
             val room = Room.findById(id) ?: throw HttpStatusCode.NotFound.exception()
-            if (room.occupation?.guest?.id != session.user.id) throw HttpStatusCode.Forbidden.exception()
+            if (room.occupation?.userSatisfy(
+                    session.user,
+                    Rights.ACCESS_ROOM
+                ) != true
+            ) throw HttpStatusCode.Forbidden.exception()
             room.isOpen = true
+            FirebaseMessaging.getInstance().sendMulticast(
+                MulticastMessage.builder()
+                    .addAllTokens(room.occupation!!.roomAccessors.flatMap { it.notificationTokens })
+                    .putData("action", "open_room")
+                    .putData("room_id", id.toString())
+                    .build()
+            )
         }
         pipeline.launch {
             delay(5000)
             transaction {
-                Room.findById(id)!!.isOpen = false
-            }
-            if (session.notificationToken != null) {
-                FirebaseMessaging.getInstance().send(
-                    Message.builder()
-                        .setToken(session.notificationToken)
+                val room = Room.findById(id)!!
+                room.isOpen = false
+                FirebaseMessaging.getInstance().sendMulticast(
+                    MulticastMessage.builder()
+                        .addAllTokens(room.occupation!!.roomAccessors.flatMap { it.notificationTokens })
                         .putData("action", "close_room")
                         .putData("room_id", id.toString())
                         .build()

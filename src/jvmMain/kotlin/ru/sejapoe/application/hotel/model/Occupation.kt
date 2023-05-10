@@ -20,8 +20,14 @@ class Occupation(id: EntityID<Int>) : IntEntity(id) {
     var checkInDate by Occupations.checkInDate
     var checkOutDate by Occupations.checkOutDate
     val sharedAccesses by SharedAccess referrersOn SharedAccesses.occupation
+    val roomAccessors
+        get() = listOf(guest) + sharedAccesses.map { it.user }
 
     fun asDTO() = OccupationDTO(id.value, room.asLessDTO(), checkInDate, checkOutDate)
+    fun userSatisfy(user: User, right: Rights): Boolean {
+        if (guest == user) return true
+        return sharedAccesses.firstOrNull { it.user == user }?.rights?.satisfy(right) == true
+    }
 }
 
 @Serializable

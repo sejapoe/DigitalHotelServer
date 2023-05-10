@@ -18,7 +18,7 @@ class SharedAccess(id: EntityID<Int>) : IntEntity(id) {
     var user by User referencedOn SharedAccesses.user
     var rights by SharedAccesses.rights.transform(RightsComposition::value, ::RightsComposition)
     var budget by SharedAccesses.budget
-    fun asDTO() = SharedAccessDTO(id.value, rights.value, user.asLessDTO(), budget ?: -1)
+    fun asDTO() = SharedAccessDTO(id.value, rights.value, user.asLessDTO(), budget)
 }
 
 enum class Rights(val value: Short) {
@@ -39,11 +39,11 @@ data class RightsComposition(val value: Short) {
 }
 
 @Serializable
-data class SharedAccessDTO(val id: Int, val rightValue: Short, val user: UserLessDTO, val budget: Int)
+data class SharedAccessDTO(val id: Int, val rightsValue: Short, val user: UserLessDTO, val budget: Int)
 
 object SharedAccesses : IntIdTable() {
     val occupation = reference("occupation", Occupations)
     val user = reference("user", Users)
     val rights = short("rights").default(RightsComposition.default.value)
-    val budget = integer("budget").nullable()
+    val budget = integer("budget")
 }
