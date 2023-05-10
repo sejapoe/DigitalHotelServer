@@ -45,5 +45,5 @@ object SharedAccesses : IntIdTable() {
     val occupation = reference("occupation", Occupations)
     val user = reference("user", Users)
     val rights = short("rights").default(RightsComposition.default.value)
-    val budget = integer("budget")
+    val budget = integer("budget").default(-1)
 }
