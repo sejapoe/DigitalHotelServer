@@ -12,15 +12,27 @@ import ru.sejapoe.routing.Get
 import ru.sejapoe.routing.Post
 import ru.sejapoe.routing.Route
 
+fun <E> MutableList<E>.popRandom(): E {
+    val el = random()
+    remove(el)
+    return el
+}
+
 @Route("/hotel")
 object HotelRoute {
     @Post("/populate")
     fun populate() = transaction {
-        val roomTypePrice = listOf(
-            "Standard" to 100,
-            "Superior" to 200,
-            "Deluxe" to 300,
-            "Suite" to 400
+        val roomTypeNames = listOf(
+            "Standard",
+            "Superior",
+            "Ultra",
+            "Deluxe",
+            "Chef",
+            "Lux",
+            "Suite",
+            "Piece of shit",
+            "Closet",
+            "Carton box"
         )
 
         val hotelNames = listOf(
@@ -36,7 +48,14 @@ object HotelRoute {
             }
         }
 
+
+
         hotels.forEach { hotel ->
+            val availableRoomNumbers = (100..999).toMutableList()
+            val availableRoomTypeNames = roomTypeNames.toMutableList()
+            val roomTypePrice = List((4..7).random()) {
+                availableRoomTypeNames.popRandom() to (10..100).random() * 10
+            }.sortedBy { it.second }
             roomTypePrice.forEach { (name, price) ->
                 val roomType = RoomType.new {
                     this.name = name
@@ -53,7 +72,7 @@ object HotelRoute {
                     Room.new {
                         this.hotel = hotel
                         this.type = roomType
-                        this.number = it
+                        this.number = availableRoomNumbers.popRandom()
                     }
                 }
             }

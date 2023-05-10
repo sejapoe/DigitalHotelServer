@@ -25,7 +25,6 @@ object DatabasesFactory {
         transaction {
             addLogger(StdOutSqlLogger)
 
-            SchemaUtils.drop(SharedAccesses)
             SchemaUtils.createMissingTablesAndColumns(
                 Users,
                 Sessions,
