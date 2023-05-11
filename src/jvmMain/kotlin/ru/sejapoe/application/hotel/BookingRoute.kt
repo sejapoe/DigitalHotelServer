@@ -1,5 +1,8 @@
 package ru.sejapoe.application.hotel
 
+import com.google.firebase.messaging.AndroidNotification
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.MulticastMessage
 import io.ktor.http.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.sejapoe.application.hotel.model.*
@@ -36,7 +39,7 @@ object BookingRoute {
     // TODO: Remove on production, just for demonstration
     @Suppress("DuplicatedCode")
     @Get("/{rawId}/checkIn")
-    fun checkInDemo(rawId: Int) = transaction {
+    fun checkInDemo(rawId: Int): Unit = transaction {
         val id = (rawId - 13) / 71
         if ((rawId - 13) % 71 != 0 || id <= 0) throw HttpStatusCode.Conflict.exception()
         val booking = Booking.findById(id) ?: throw HttpStatusCode.NotFound.exception()
@@ -49,8 +52,15 @@ object BookingRoute {
             room = Room.find { Rooms.type eq booking.roomType.id }.firstOrNull()
                 ?: throw HttpStatusCode.Conflict.exception()
         }
-        occupation.room.occupation = occupation
         booking.delete()
+        occupation.room.occupation = occupation
+        FirebaseMessaging.getInstance().sendMulticast(
+            MulticastMessage.builder()
+                .addAllTokens(occupation.guest.notificationTokens)
+                .putData("action", "check_in")
+                .putData("booking_id", id.toString())
+                .build()
+        )
     }
 
     @Post("/{id}/pay")
