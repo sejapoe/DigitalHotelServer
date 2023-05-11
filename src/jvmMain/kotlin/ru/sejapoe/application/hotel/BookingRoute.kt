@@ -12,6 +12,7 @@ import java.time.LocalDateTime
 @Suppress("UNUSED")
 @Route("/booking")
 object BookingRoute {
+    @Suppress("DuplicatedCode")
     @Post("/{id}/checkIn")
     fun checkIn(id: Int, @Provided session: Session) =
         transaction {
@@ -32,6 +33,25 @@ object BookingRoute {
             occupation.id.value
         }
 
+    // TODO: Remove on production, just for demonstration
+    @Suppress("DuplicatedCode")
+    @Get("/{rawId}/checkIn")
+    fun checkInDemo(rawId: Int) = transaction {
+        val id = (rawId - 13) / 71
+        if ((rawId - 13) % 71 != 0 || id <= 0) throw HttpStatusCode.Conflict.exception()
+        val booking = Booking.findById(id) ?: throw HttpStatusCode.NotFound.exception()
+        if (booking.payment == null) throw HttpStatusCode.PaymentRequired.exception()
+        if (LocalDate.now() < booking.checkInDate) throw HttpStatusCode.Forbidden.exception()
+        val occupation = Occupation.new {
+            guest = booking.guest
+            checkInDate = booking.checkInDate
+            checkOutDate = booking.checkOutDate
+            room = Room.find { Rooms.type eq booking.roomType.id }.firstOrNull()
+                ?: throw HttpStatusCode.Conflict.exception()
+        }
+        occupation.room.occupation = occupation
+        booking.delete()
+    }
 
     @Post("/{id}/pay")
     fun pay(id: Int, @Provided session: Session) =
