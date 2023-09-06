@@ -16,15 +16,15 @@ private const val developmentUrl = "jdbc:postgresql://localhost:5432/test"
 
 object DatabasesFactory {
     fun init(isProduction: Boolean) {
-//        val database = Database.connect(
-//            if (isProduction) productionUrl else developmentUrl,
-//            driver = "org.postgresql.Driver",
-//            user = "sejapoe"
-//        )
-        Database.connect(
-            "jdbc:h2:mem:test",
-            driver = "org.h2.Driver"
+        val database = Database.connect(
+            if (isProduction) productionUrl else developmentUrl,
+            driver = "org.postgresql.Driver",
+            user = "sejapoe"
         )
+//        Database.connect(
+//            "jdbc:h2:mem:test",
+//            driver = "org.h2.Driver"
+//        )
 
         transaction {
             addLogger(StdOutSqlLogger)
