@@ -51,6 +51,7 @@ kotlin {
                 implementation("io.jsonwebtoken:jjwt-impl:0.11.2")
                 implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
                 implementation("org.postgresql:postgresql:42.3.1")
+                implementation("com.h2database:h2:2.1.214")
                 implementation("org.jetbrains.exposed:exposed-core:0.41.1")
                 implementation("org.jetbrains.exposed:exposed-dao:0.41.1")
                 implementation("org.jetbrains.exposed:exposed-jdbc:0.41.1")
